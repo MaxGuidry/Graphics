@@ -18,6 +18,24 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\gl_core_4_4.c" />
+    <ClCompile Include="src\imgui.cpp" />
+    <ClCompile Include="src\imgui_demo.cpp" />
+    <ClCompile Include="src\imgui_draw.cpp" />
+    <ClCompile Include="src\imgui_impl_glfw_gl3.cpp" />
+    <ClCompile Include="src\Main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\gl_core_4_4.h" />
+    <ClInclude Include="inc\imconfig.h" />
+    <ClInclude Include="inc\imgui.h" />
+    <ClInclude Include="inc\imgui_impl_glfw_gl3.h" />
+    <ClInclude Include="inc\imgui_internal.h" />
+    <ClInclude Include="inc\stb_rect_pack.h" />
+    <ClInclude Include="inc\stb_textedit.h" />
+    <ClInclude Include="inc\stb_truetype.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F8A5738B-48C3-4800-B280-BB3E6501D483}</ProjectGuid>
     <RootNamespace>Bootstrap</RootNamespace>
@@ -118,9 +136,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="src\Main.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
