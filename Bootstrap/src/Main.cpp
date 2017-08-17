@@ -42,7 +42,7 @@ int main()
 			0, 1, 0, 0, 
 			0, 0, 1, 0, 
 			0, 0, 0, 1);
-	float theta = 0.01f;
+	float theta = 0.002f;
 	Gizmos::create();
 	glEnable(GL_DEPTH_TEST);
 	float  f = 0.0f;
@@ -105,7 +105,7 @@ int main()
 				glm::sin(theta), glm::cos(theta), 0, 0,
 				0, 0, 1, 0,
 				0, 0, 0, 1);
-		spheremat= spheremat * (rotx *roty * rotz) ;
+		spheremat= spheremat * (rotx  * rotz) ;
 		glm::mat4 * matptr = &spheremat;
 		Gizmos::addSphere(glm::vec3(0,0,0), 5.f, 50, 50,black,matptr);
 		Gizmos::draw(proj * view);
