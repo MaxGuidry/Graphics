@@ -2,6 +2,7 @@
 //#include<Gizmos.h>
 //#include <glm/glm.hpp>
 #include "TestApp.h"
+#include "DollyCamera.h"
 //#include <imgui.h>
 //#include <imgui_impl_glfw_gl3.h>
 //#include<glm\ext.hpp>

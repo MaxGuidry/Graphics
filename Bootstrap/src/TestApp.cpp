@@ -1,8 +1,12 @@
 #include "TestApp.h"
 #include <gl_core_4_4.h>
 #include<glfw/glfw3.h>
+#include "Gizmos.h"
+#include<glm/glm.hpp>
+#include <glm/gtc/matrix_transform.inl>
+#include <glm/gtc/constants.inl>
 
-TestApp::TestApp(): shader_programme(0)
+TestApp::TestApp() : shader_programme(0), m_camera(new DollyCamera())
 {
 }
 
@@ -17,26 +21,49 @@ bool TestApp::Update(float deltaTime)
 }
 bool TestApp::Draw()
 {
-	
-	glUseProgram(shader_programme);
+
+	/*glUseProgram(shader_programme);
 	glBindVertexArray(vao);
 	glDrawArrays(GL_TRIANGLES,0,3);
+	*/
 	
+
+	Gizmos::clear();
+	
+	Gizmos::addTransform(glm::mat4(1));
+	glm::vec4 white(1);
+	glm::vec4 black(0, 0, 0, 1);
+
+	for (int i = 0; i < 21; ++i)
+	{
+		Gizmos::addLine(
+			glm::vec3(-10 + i, 0, 10),
+			glm::vec3(-10 + i, 0, -10),
+			i == 10 ? white : black);
+		Gizmos::addLine(
+			glm::vec3(10, 0, -10 + i),
+			glm::vec3(-10, 0, -10 + i),
+			i == 10 ? white : black);
+
+	}
+	Gizmos::addSphere(glm::vec3(0, 0, 0), 5.f, 50, 50, black);
+	Gizmos::draw(m_camera->getProjectionView());
 	return true;
 }
 bool TestApp::Start()
 {
-	float points[] = {
+	this->m_camera->LookAt(glm::vec3(10, 10, 10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	/*float points[] = {
 		0.0f,  0.5f,  0.0f,
 		0.5f, -0.5f,  0.0f,
 		-0.5f, -0.5f,  0.0f
 	};
 	GLuint vbo = 0;
-	
+
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), points, GL_STATIC_DRAW);
-	
+
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 	glEnableVertexAttribArray(0);
@@ -63,7 +90,8 @@ bool TestApp::Start()
 	shader_programme = glCreateProgram();
 	glAttachShader(shader_programme, fs);
 	glAttachShader(shader_programme, vs);
-	glLinkProgram(shader_programme);
+	glLinkProgram(shader_programme);*/
+	Gizmos::create();
 	return true;
 }
 
@@ -75,9 +103,9 @@ bool TestApp::Shutdown()
 
 
 
-bool TestApp::Run(unsigned int width,unsigned int height, const char* appname, bool fullscreen)
+bool TestApp::Run(unsigned int width, unsigned int height, const char* appname, bool fullscreen)
 {
-	
+
 	if (appname == nullptr || width == 0 || height == 0)
 		return false;
 	if (!glfwInit())
@@ -96,6 +124,7 @@ bool TestApp::Run(unsigned int width,unsigned int height, const char* appname, b
 	float currentTime = glfwGetTime();
 	float prevTime = 0;
 	glfwSwapInterval(0);
+	glClearColor(.2f, .3f, .5f, 1);
 	Start();
 	while (this->m_running)
 	{

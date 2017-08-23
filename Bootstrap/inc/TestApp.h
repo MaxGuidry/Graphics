@@ -1,5 +1,7 @@
 #pragma once
 #include "Application.h"
+#include "DollyCamera.h"
+
 class TestApp :
 	public Application
 {
@@ -20,5 +22,6 @@ public:
 	bool Run(unsigned int width, unsigned int height, const char * appname, bool fullscreen);
 	GLuint vao = 0;
 	GLuint shader_programme;
+	DollyCamera  * m_camera;
 };
 
