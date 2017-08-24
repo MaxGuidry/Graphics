@@ -7,9 +7,9 @@ public:
 	DollyCamera();
 	~DollyCamera();
 
-	glm::mat4 m_position;
+	glm::vec3 m_position;
 	glm::mat4 m_view;
-
+	glm::vec3 focus;
 	virtual void update(float deltaTime);
 	void setPerspective(float FOV, float aspectRatio, float near, float far);
 	void LookAt(glm::vec3 eye, glm::vec3 center, glm::vec3 up);
@@ -18,8 +18,8 @@ public:
 	glm::mat4 getView();
 	glm::mat4 getProjection();
 	glm::mat4 getProjectionView();
-
-
+	void RotateAround(glm::vec2 deltaMouse);
+	void LookAround(glm::vec2 deltaMouse);
 private:
 	float m_fov;
 	float m_aspectRatio;

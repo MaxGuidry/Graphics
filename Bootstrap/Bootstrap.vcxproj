@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\CameraApp.cpp" />
     <ClCompile Include="src\DollyCamera.cpp" />
     <ClCompile Include="src\FlyCamera.cpp" />
     <ClCompile Include="src\Application.cpp" />
@@ -32,6 +33,7 @@
     <ClCompile Include="src\TestApp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="inc\CameraApp.h" />
     <ClInclude Include="inc\DollyCamera.h" />
     <ClInclude Include="inc\FlyCamera.h" />
     <ClInclude Include="inc\Application.h" />

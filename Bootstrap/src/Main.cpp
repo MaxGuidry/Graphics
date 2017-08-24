@@ -2,6 +2,7 @@
 //#include<Gizmos.h>
 //#include <glm/glm.hpp>
 #include "TestApp.h"
+#include "CameraApp.h"
 #include "DollyCamera.h"
 //#include <imgui.h>
 //#include <imgui_impl_glfw_gl3.h>
@@ -207,7 +208,7 @@
 
 int main()
 {
-	auto  app = new TestApp();
+	auto  app = new CameraApp();
 	
 	app->Run(1600, 900, "test", false);
 	delete app;
