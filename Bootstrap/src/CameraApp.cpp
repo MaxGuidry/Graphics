@@ -3,7 +3,7 @@
 #include<glfw/glfw3.h>
 #include "Gizmos.h"
 #include<glm/glm.hpp>
-#include <glm/gtc/matrix_transform.inl>
+
 
 CameraApp::CameraApp() : m_camera(new DollyCamera())
 {
@@ -16,19 +16,35 @@ CameraApp::~CameraApp()
 
 bool CameraApp::Update(float deltaTime)
 {
-	double* mousex = new double;
-	double* mousey = new double;
-	glfwGetCursorPos(window, mousex, mousey);
-	std::cout << *mousex << "," << *mousey << std::endl;
-	glm::vec2 deltaMouse(*mousex - mouseX, *mousey - mouseY);
+	static bool mouse_down = false;
+	/*if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS)
+	{*/
+	static double mousex = 0;
+	static double mousey = 0;
+
+	if (mouse_down == false)
+	{
+		mouse_down = true;
+		glfwGetCursorPos(window, &mousex, &mousey);
+	}
+
+
+	glfwGetCursorPos(window, &mousex, &mousey);
+	glm::vec2 cpos = glm::vec2(mousex, mousey);
+
+
+	glm::vec2 deltaMouse = glm::vec2(mousex - pmouseX, mousey - pmouseY);
 	deltaMouse = deltaMouse * deltaTime * 15.f;
-	if (glfwGetMouseButton(window, 2))
-		m_camera->RotateAround(deltaMouse);
-	mouseX = *mousex;
-	mouseY = *mousey;
-	//std::cout << deltaMouse.x << "," << deltaMouse.y << std::endl;
-	delete mousex;
-	delete mousey;
+	std::cout << "x: " << deltaMouse.x << " y: " << deltaMouse.y << std::endl << std::flush;
+
+
+	if (glfwGetMouseButton(window, 0))
+		m_camera->LookAround(deltaMouse);
+
+	pmouseX = mousex;
+	pmouseY = mousey;
+
+	//}
 	return true;
 }
 bool CameraApp::Draw()
@@ -133,9 +149,9 @@ bool CameraApp::Run(unsigned int width, unsigned int height, const char* appname
 		glfwTerminate();
 	}
 	glEnable(GL_DEPTH_TEST);
-	float deltaTime = 0;
-	float currentTime = glfwGetTime();
-	float prevTime = 0;
+	double deltaTime = 0;
+	double currentTime = glfwGetTime();
+	double prevTime = 0;
 	glfwSwapInterval(0);
 	glClearColor(.2f, .3f, .5f, 1);
 	Start();
@@ -147,11 +163,10 @@ bool CameraApp::Run(unsigned int width, unsigned int height, const char* appname
 		if (glfwGetKey(this->window, GLFW_KEY_ESCAPE))
 			glfwSetWindowShouldClose(this->window, true);
 		glfwPollEvents();
-		this->Update(deltaTime);
+		this->Update((float)deltaTime);
 		prevTime = currentTime;
 		currentTime = float(glfwGetTime());
 		deltaTime = (currentTime - prevTime);
-		//std::cout << (int)(1.f / deltaTime) << std::endl;
 
 		this->Draw();
 		glfwSwapBuffers(this->window);

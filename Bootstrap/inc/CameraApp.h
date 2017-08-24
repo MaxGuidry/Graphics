@@ -17,7 +17,7 @@ protected:
 	bool Draw() override;
 	DollyCamera * m_camera;
 private:
-	double mouseX;
-	double mouseY;
+	double pmouseX;
+	double pmouseY;
 };
 

@@ -1,9 +1,8 @@
 #include "DollyCamera.h"
-#include <glm/gtc/matrix_transform.inl>
-#include <glm/gtc/constants.inl>
-#include <glfw/glfw3.h>
+#include "glm/ext.hpp"
+#include "glm/glm.hpp"
 
-DollyCamera::DollyCamera() : m_position(10, 10, 10), m_view(glm::mat4(1)), m_fov(glm::pi<float>() / 4.f), m_aspectRatio(16.f / 9.f), m_near(.1f), m_far(1000.f), worldTransform(glm::mat4(1)), m_projection(glm::mat4(1)), viewTransform(glm::mat4(1)), projectionTransform(glm::mat4(1)), projectionViewTransform(glm::mat4(1)), focus(0, 0, 0)
+DollyCamera::DollyCamera() : m_position(10, 10, 10), m_view(glm::mat4(1)), focus(0, 0, 0), m_fov(glm::pi<float>() / 4.f), m_aspectRatio(16.f / 9.f), m_near(.1f), m_far(1000.f), worldTransform(glm::mat4(1)), m_projection(glm::mat4(1)), viewTransform(glm::mat4(1)), projectionTransform(glm::mat4(1)), projectionViewTransform(glm::mat4(1))
 {
 
 	setPerspective(glm::pi<float>() / 4.f, 16.f / 9.f, 0.1f, 1000.f);
@@ -121,21 +120,71 @@ void DollyCamera::RotateAround(glm::vec2 deltaMouse)
 
 void DollyCamera::LookAround(glm::vec2 deltaMouse)
 {
-	glm::mat4 rotx =
+
+	deltaMouse = -deltaMouse * .2f;
+	/*glm::vec3 oldZAxis = glm::vec3(m_view[0][2], m_view[1][2], m_view[2][2]);
+
+
+	float angley = glm::acos(glm::dot(glm::vec3(0, 0, 1), glm::normalize(glm::vec3(oldZAxis.x, 0, 1))));
+	float anglex = glm::acos(glm::dot(glm::vec3(0, 0, 1), glm::normalize(glm::vec3(0, oldZAxis.y, 1))));
+	glm::mat4 Y = glm::mat4(1);
+	glm::mat4 xrotfory =
 		glm::mat4(
-			1, cos(deltaMouse.y), -sin(deltaMouse.y), 0,
-			0, sin(deltaMouse.y), cos(deltaMouse.y), 0,
-			0, 0, 1, 0,
+			1, 0, 0, 0,
+			0, glm::cos(-angley), -glm::sin(-angley), 0,
+			0, glm::sin(-angley), glm::cos(-angley), 0,
+			0, 0, 0, 1
+		);
+	glm::mat4 yrotfory =
+		glm::mat4(
+			glm::cos(-anglex), 0, glm::sin(-anglex), 0,
+			0, 1, 0, 0,
+			-glm::sin(-anglex), 0, glm::cos(-anglex), 0,
+			0, 0, 0, 1
+		);*/
+	/*glm::mat4 combinedYROT = xrotfory * yrotfory;
+	Y = combinedYROT *Y;
+	glm::vec3 YAxis = glm::vec3(Y[0][1], Y[1][1], Y[2][1]);*/
+		glm::mat4 rotx =
+		glm::mat4(
+			1, 0, 0, 0,
+			0, glm::cos(deltaMouse.y), -glm::sin(deltaMouse.y), 0,
+			0, glm::sin(deltaMouse.y), glm::cos(deltaMouse.y), 0,
 			0, 0, 0, 1
 		);
 	glm::mat4 roty =
 		glm::mat4(
-			cos(deltaMouse.x), 0, sin(deltaMouse.x), 0,
+			glm::cos(deltaMouse.x), 0, glm::sin(deltaMouse.x), 0,
 			0, 1, 0, 0,
-			-sin(deltaMouse.x), 0, cos(deltaMouse.x), 0,
+			-glm::sin(deltaMouse.x), 0, glm::cos(deltaMouse.x), 0,
 			0, 0, 0, 1
 		);
+	glm::mat4 combinedRot = rotx * roty;
+	glm::vec3 prevz = glm::vec3(m_view[0][2], m_view[1][2], m_view[2][2]);
+	m_view = combinedRot  * m_view;
+	//m_view = combinedRot * m_view;
+	/*glm::vec3 newXAxis = glm::vec3(m_view[0][0], m_view[1][0], m_view[2][0]);
+	glm::vec3 newZAxis = glm::vec3(m_view[0][2], m_view[1][2], m_view[2][2]);
+	glm::vec3 newYAxis = glm::cross(newZAxis, newXAxis);*/
+	glm::vec3 up = glm::vec3(0, 1, 0);
+	glm::vec3 newz = glm::vec3(m_view[0][2], m_view[1][2], m_view[2][2]);
+	glm::vec3 z = glm::normalize(glm::vec3(newz.x, prevz.y, newz.z));
+	glm::vec3 x = glm::normalize(glm::cross(up, z));
+	glm::vec3 y = glm::cross(z, x);
+	glm::mat4 v = glm::mat4(
+		x.x, y.x, z.x, 0,
+		x.y, y.y, z.y, 0,
+		x.z, y.z, z.z, 0,
+		0, 0, 0, 1);
 
+
+	glm::mat4 translation = glm::mat4(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		-m_position.x, -m_position.y, -m_position.z, 1);
+	m_view = v * translation;
+	worldTransform = glm::inverse(m_view);
 }
 
 void DollyCamera::updateProjectionViewTransfrom()
