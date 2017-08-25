@@ -18,7 +18,7 @@ public:
 	glm::mat4 getView();
 	glm::mat4 getProjection();
 	glm::mat4 getProjectionView();
-	void RotateAround(glm::vec2 deltaMouse);
+	glm::vec3 RotateAround(glm::vec3 position, glm::vec3 orbitPos, glm::vec2 deltaMouse,glm::mat4 objMat);
 	void LookAround(glm::vec2 deltaMouse);
 	void SimpleRot(glm::vec2 deltaMouse);
 private:
