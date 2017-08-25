@@ -35,12 +35,17 @@ bool CameraApp::Update(float deltaTime)
 
 	glm::vec2 deltaMouse = glm::vec2(mousex - pmouseX, mousey - pmouseY);
 	deltaMouse = deltaMouse * deltaTime * 15.f;
-	std::cout << "x: " << deltaMouse.x << " y: " << deltaMouse.y << std::endl << std::flush;
+	//std::cout << "x: " << deltaMouse.x << " y: " << deltaMouse.y << std::endl << std::flush;
 
 
 	if (glfwGetMouseButton(window, 0))
-		m_camera->LookAround(deltaMouse);
-
+		m_camera->SimpleRot(deltaMouse);
+		//m_camera->LookAround(deltaMouse);
+	if(glfwGetMouseButton(window, GLFW_KEY_W))
+	{
+		glm::vec3 right = glm::vec3(m_camera->m_view[0][0], m_camera->m_view[1][0], m_camera->m_view[2][0]);
+		  
+	}
 	pmouseX = mousex;
 	pmouseY = mousey;
 
@@ -80,7 +85,7 @@ bool CameraApp::Draw()
 }
 bool CameraApp::Start()
 {
-	this->m_camera->LookAt(glm::vec3(10, 10, 10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	this->m_camera->LookAt(m_camera->m_position, glm::vec3(0, 10, 0), glm::vec3(0, 1, 0));
 	/*float points[] = {
 	0.0f,  0.5f,  0.0f,
 	0.5f, -0.5f,  0.0f,

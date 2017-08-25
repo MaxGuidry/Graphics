@@ -20,6 +20,7 @@ public:
 	glm::mat4 getProjectionView();
 	void RotateAround(glm::vec2 deltaMouse);
 	void LookAround(glm::vec2 deltaMouse);
+	void SimpleRot(glm::vec2 deltaMouse);
 private:
 	float m_fov;
 	float m_aspectRatio;
@@ -28,8 +29,6 @@ private:
 
 	glm::mat4 worldTransform;
 	glm::mat4 m_projection;
-	glm::mat4 viewTransform;
-	glm::mat4 projectionTransform;
 	glm::mat4 projectionViewTransform;
 
 	void updateProjectionViewTransfrom();
