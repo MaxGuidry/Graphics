@@ -48,10 +48,25 @@ bool CameraApp::Update(float deltaTime)
 	if (glfwGetMouseButton(window, 0))
 		//m_camera->SimpleRot(deltaMouse);
 		m_camera->LookAround(deltaMouse);
-	if (glfwGetMouseButton(window, GLFW_KEY_W))
+	if (glfwGetKey(window, GLFW_KEY_D))
 	{
 		glm::vec3 right = glm::vec3(m_camera->m_view[0][0], m_camera->m_view[1][0], m_camera->m_view[2][0]);
-
+		m_camera->setPosition(right);
+	}
+	if (glfwGetKey(window, GLFW_KEY_W))
+	{
+		glm::vec3 forward = glm::vec3(m_camera->m_view[0][2], m_camera->m_view[1][2], m_camera->m_view[2][2]);
+		m_camera->setPosition(-forward);
+	}
+	if (glfwGetKey(window, GLFW_KEY_S))
+	{
+		glm::vec3 forward = glm::vec3(m_camera->m_view[0][2], m_camera->m_view[1][2], m_camera->m_view[2][2]);
+		m_camera->setPosition(forward);
+	}
+	if (glfwGetKey(window, GLFW_KEY_A))
+	{
+		glm::vec3 right = glm::vec3(m_camera->m_view[0][0], m_camera->m_view[1][0], m_camera->m_view[2][0]);
+		m_camera->setPosition(-right);
 	}
 	glm::vec3 mercpos = m_camera->RotateAround(glm::vec3(mercury[3][0], mercury[3][1], mercury[3][2]), glm::vec3(0), glm::vec2(.1f, 0), mercury);
 	mercury[3][0] = mercpos.x;
@@ -278,7 +293,7 @@ bool CameraApp::Run(unsigned int width, unsigned int height, const char* appname
 		prevTime = currentTime;
 		currentTime = float(glfwGetTime());
 		deltaTime = (currentTime - prevTime);
-		std::cout << (int)(1.f / deltaTime) << std::endl;
+		//std::cout << (int)(1.f / deltaTime) << std::endl;
 
 		this->Draw();
 		glfwSwapBuffers(this->window);

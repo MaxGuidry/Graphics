@@ -69,6 +69,17 @@ void DollyCamera::LookAt(glm::vec3 eye, glm::vec3 center, glm::vec3 up)
 
 void DollyCamera::setPosition(glm::vec3 position)
 {
+	glm::mat4 t = 
+		glm::mat4(
+			1,0,0,0,
+			0,1,0,0,
+			0,0,1,0,
+			-position.x,-position.y,-position.z,1
+			);
+	
+	m_view = m_view * t;
+	//m_position = glm::vec3(m_view[3][0], m_view[3][1], m_view[3][2]);
+	worldTransform = glm::inverse(m_view);
 }
 
 glm::mat4 DollyCamera::getWorldTransform()
