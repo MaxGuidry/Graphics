@@ -12,12 +12,14 @@ public:
 	//virtual bool Run(unsigned int width, unsigned int height, const char * appname, bool fullscreen);
 	GLFWwindow * window;
 	bool m_running;
+	bool Run(unsigned int width, unsigned int height, const char * appname, bool fullscreen);
+
 protected:
 	virtual bool Start() = 0;
 	virtual bool Update(float deltaTime) = 0;
 	virtual bool Shutdown() = 0;
 	virtual bool Draw() = 0;
-
+	
 	
 };
 

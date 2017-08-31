@@ -4,8 +4,8 @@
 #include "TestApp.h"
 #include "CameraApp.h"
 #include "DollyCamera.h"
-//#include <imgui.h>
-//#include <imgui_impl_glfw_gl3.h>
+#include "ReadFile.h"
+
 //#include<glm\ext.hpp>
 
 
@@ -208,8 +208,9 @@
 
 int main()
 {
-	auto  app = new CameraApp();
-	
+	Application * app = new CameraApp();
+	const char * test = FileRead("./vertexshader.vert");
+	std::cout << test << std::endl;
 	app->Run(1600, 900, "test", false);
 	delete app;
 	return 0;
