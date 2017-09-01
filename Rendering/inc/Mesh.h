@@ -22,7 +22,7 @@ private:
 	unsigned int m_vao;
 	unsigned int m_vbo;
 	unsigned int m_ibo;
-	std::vector<unsigned int> m_indeces;
+	std::vector<unsigned int> m_indices;
 	std::vector<Vertex> m_vertices;
 };
 

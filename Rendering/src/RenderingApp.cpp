@@ -4,6 +4,7 @@
 #include <gl_core_4_4.h>
 #include <glfw/include/glfw/glfw3.h>
 #include <vector>
+#include "tiny_obj_loader.h"
 
 
 glm::mat4 grid =
@@ -35,28 +36,35 @@ Mesh * RenderingApp::GenGrid(unsigned int rows, unsigned int cols)
 	unsigned int * auiIndices = new unsigned int[(rows - 1) * (cols - 1) * 6];
 
 	unsigned int index = 0;
+	std::vector<Vertex> verts = std::vector<Vertex>();
+	std::vector<unsigned int> indices = std::vector<unsigned int>();
 	for (unsigned int r = 0; r < (rows - 1); ++r)
 		for (unsigned int c = 0; c < (cols - 1); ++c)
 		{
-			auiIndices[index++] = r * cols + c;
-			auiIndices[index++] = (r + 1) * cols + c;
+			auiIndices[index++] = r * cols + c;			
+			auiIndices[index++] = (r + 1) * cols + c;			
 			auiIndices[index++] = (r + 1) * cols + (c + 1);
-
+			
 			auiIndices[index++] = r * cols + c;
 			auiIndices[index++] = (r + 1) * cols + (c + 1);
 			auiIndices[index++] = r * cols + (c + 1);
 		}
-	std::vector<Vertex> verts = std::vector<Vertex>();
-	std::vector<unsigned int> indeces = std::vector<unsigned int>();
+
+	
+	
+	
+	
 	for (unsigned int i = 0; i < (rows * cols); i++)
 		verts.push_back(aoVerts[i]);
-	for (unsigned int i = 0; i < (rows * cols * 6); i++)
-		indeces.push_back(auiIndices[i]);
+	for (unsigned int i = 0; i < index; i++)
+		indices.push_back(auiIndices[i]);
+
+
+
 	Mesh * gridMesh = new Mesh();
-	gridMesh->initialize(verts, indeces);
+	gridMesh->initialize(verts, indices);
+
 #pragma region circle
-
-
 	//Vertex * aoVerts = new Vertex[100];
 	//unsigned int * auiIndices = new unsigned int[200];
 
@@ -89,24 +97,18 @@ Mesh * RenderingApp::GenGrid(unsigned int rows, unsigned int cols)
 
 	gridMesh->create_buffers();
 	gridMesh->bind();
-	
-
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec4)));
-
-
-	
+	verts.clear();
+	indices.clear();
 	delete[] auiIndices;
 	delete[] aoVerts;
 	return gridMesh;
 }
 
+Mesh box = Mesh();
 
 bool RenderingApp::Start()
 {
-
+	
 	camera->LookAt(glm::vec3(15, 15, 15), glm::vec3(5, 0, 5), glm::vec3(0, 1, 0));
 	const char * vsSource = FileRead("./vertex.vert");
 	const char * fsSource = FileRead("./fragment.frag");
@@ -137,8 +139,55 @@ bool RenderingApp::Start()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	delete vsSource;
 	delete fsSource;
-	mesh = GenGrid(10, 10);
+	mesh = GenGrid(3, 3);
+	Vertex a = { glm::vec4(0,0,0,1),glm::vec4(1,1,1,1) };
+	Vertex b = { glm::vec4(1,0,0,1),glm::vec4(1,1,1,1) };
+	Vertex c = { glm::vec4(0,1,0,1),glm::vec4(1,1,1,1) };
+	Vertex d = { glm::vec4(1,1,0,1),glm::vec4(1,1,1,1) };
+	Vertex e = { glm::vec4(0,2,0,1),glm::vec4(1,1,1,1) };
+	Vertex f = { glm::vec4(1,2,0,1),glm::vec4(1,1,1,1) };
+	Vertex g = { glm::vec4(0,3,0,1),glm::vec4(1,1,1,1) };
 
+	Vertex h = { glm::vec4(1,3,0,1),glm::vec4(1,1,1,1) };
+	Vertex i = { glm::vec4(0,4,0,1),glm::vec4(1,1,1,1) };
+	Vertex j = { glm::vec4(1,4,0,1),glm::vec4(1,1,1,1) };
+	Vertex k = { glm::vec4(0,5,0,1),glm::vec4(1,1,1,1) };
+	Vertex l = { glm::vec4(1,5,0,1),glm::vec4(1,1,1,1) };
+	Vertex m = { glm::vec4(0,6,0,1),glm::vec4(1,1,1,1) };
+	Vertex n = { glm::vec4(1,6,0,1),glm::vec4(1,1,1,1) };
+	std::vector<Vertex> boxVerts{ a,b,c,d,e,f,g,h,i,j,k,l,m,n };
+	std::vector<unsigned int> boxindeces
+	{
+		/*0,1,3,
+		3,0,2,
+		2,4,0,
+		0,4,6,
+		6,7,5,
+		5,6,4,
+		4,2,3,
+		3,4,5,
+		5,3,1,
+		1,5,7,
+		7,6,1,
+		1,6,0*/
+		0,2,1,
+		1,2,3,
+		3,5,2,
+		2,5,4,
+		4,6,5,
+		5,6,7,
+		7,9,6,
+		6,9,8,
+		8,10,9,
+		9,10,11,
+		11,13,10,
+		10,12,13
+
+	};
+	
+	box.initialize(boxVerts, boxindeces);
+	box.create_buffers();
+	box.bind();
 	return true;
 }
 static double mousex = 0;
@@ -203,14 +252,17 @@ bool RenderingApp::Draw()
 	glUniform1f(time, glfwGetTime());
 
 	glUniformMatrix4fv(projectionViewUniform, 1, false, glm::value_ptr(camera->getProjectionView()));
-	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
-	grid = grid * glm::mat4(
-		glm::cos(.1f), 0, -glm::sin(.1f), 0,
+	glDrawElements(GL_TRIANGLES, mesh->index_Count, GL_UNSIGNED_INT, 0);
+	mesh->unbind();
+	box.bind();
+	/*grid = grid * glm::mat4(
+		glm::cos(.01f), 0, -glm::sin(.01f), 0,
 		0, 1, 0, 0,
-		glm::sin(.1f), 0, glm::cos(.1f), 0,
-		0, 0, 0, 1);
+		glm::sin(.01f), 0, glm::cos(.01f), 0,
+		0, 0, 0, 1);*/
 	glUniformMatrix4fv(projectionViewUniform, 1, false, glm::value_ptr(camera->getProjectionView()*  grid));
-	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, box.index_Count, GL_UNSIGNED_INT, 0);
 	glUseProgram(0);
+	box.unbind();
 	return true;
 }
