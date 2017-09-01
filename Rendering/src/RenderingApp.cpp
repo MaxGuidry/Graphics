@@ -234,6 +234,8 @@ static double mousex = 0;
 static double mousey = 0;
 static double pmouseX = 0;
 static double pmouseY = 0;
+
+
 bool RenderingApp::Update(float deltaTime)
 {
 	static bool mouse_down = false;
@@ -259,7 +261,7 @@ bool RenderingApp::Update(float deltaTime)
 		camera->setPosition(right);
 	}
 	if (glfwGetKey(window, GLFW_KEY_W))
-	{
+	{	
 		glm::vec3 forward = glm::vec3(camera->m_view[0][2], camera->m_view[1][2], camera->m_view[2][2]);
 		camera->setPosition(-forward);
 	}
@@ -268,13 +270,15 @@ bool RenderingApp::Update(float deltaTime)
 		glm::vec3 forward = glm::vec3(camera->m_view[0][2], camera->m_view[1][2], camera->m_view[2][2]);
 		camera->setPosition(forward);
 	}
-	if (glfwGetKey(window, GLFW_KEY_A))
+	if (glfwGetKey(window, GLFW_KEY_A))		
 	{
+		
 		glm::vec3 right = glm::vec3(camera->m_view[0][0], camera->m_view[1][0], camera->m_view[2][0]);
 		camera->setPosition(-right);
 	}
 	pmouseX = mousex;
 	pmouseY = mousey;
+	
 	return true;
 }
 
