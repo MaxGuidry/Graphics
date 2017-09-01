@@ -117,11 +117,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="RenderingApp.cpp" />
+    <ClCompile Include="src\Mesh.cpp" />
+    <ClCompile Include="src\RenderingApp.cpp" />
     <ClCompile Include="src\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RenderingApp.h" />
+    <ClInclude Include="inc\RenderingApp.h" />
+    <ClInclude Include="inc\Mesh.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="bin\vertex.vert" />

@@ -18,16 +18,22 @@
     <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RenderingApp.cpp">
+    <ClCompile Include="src\RenderingApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RenderingApp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <None Include="bin\vertex.vert" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="bin\vertex.vert" />
+    <ClInclude Include="inc\RenderingApp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
