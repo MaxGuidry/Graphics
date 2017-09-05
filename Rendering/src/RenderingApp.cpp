@@ -7,7 +7,7 @@
 #include "tiny_obj_loader.h"
 
 Mesh circle = Mesh();
-
+Mesh sphere = Mesh();
 glm::mat4 grid =
 glm::mat4(
 	1, 0, 0, 0,
@@ -102,7 +102,16 @@ Mesh * RenderingApp::GenGrid(unsigned int rows, unsigned int cols)
 	//}
 #pragma endregion 
 
-	gridMesh->create_buffers();
+#pragma region SPHERE
+	std::vector<Vertex> sphereVerts = std::vector<Vertex>();
+	std::vector<unsigned int> sphereIndices = std::vector < unsigned int>();
+	float y = 1.f;
+	float x = 0.f;
+	float z = 0.f;
+	
+
+#pragma endregion
+		gridMesh->create_buffers();
 	gridMesh->bind();
 	verts.clear();
 	indices.clear();
@@ -131,7 +140,8 @@ bool RenderingApp::Start()
 	glAttachShader(m_programID, fragmentShader);
 	glLinkProgram(m_programID);
 	glGetProgramiv(m_programID, GL_LINK_STATUS, &success);
-	if (success == GL_FALSE) {
+	if (success == GL_FALSE)
+	{
 		int infoLogLength = 0;
 		glGetProgramiv(m_programID, GL_INFO_LOG_LENGTH, &infoLogLength);
 		char* infoLog = new char[infoLogLength];
@@ -261,7 +271,7 @@ bool RenderingApp::Update(float deltaTime)
 		camera->setPosition(right);
 	}
 	if (glfwGetKey(window, GLFW_KEY_W))
-	{	
+	{
 		glm::vec3 forward = glm::vec3(camera->m_view[0][2], camera->m_view[1][2], camera->m_view[2][2]);
 		camera->setPosition(-forward);
 	}
@@ -270,15 +280,15 @@ bool RenderingApp::Update(float deltaTime)
 		glm::vec3 forward = glm::vec3(camera->m_view[0][2], camera->m_view[1][2], camera->m_view[2][2]);
 		camera->setPosition(forward);
 	}
-	if (glfwGetKey(window, GLFW_KEY_A))		
+	if (glfwGetKey(window, GLFW_KEY_A))
 	{
-		
+
 		glm::vec3 right = glm::vec3(camera->m_view[0][0], camera->m_view[1][0], camera->m_view[2][0]);
 		camera->setPosition(-right);
 	}
 	pmouseX = mousex;
 	pmouseY = mousey;
-	
+
 	return true;
 }
 
@@ -308,20 +318,20 @@ bool RenderingApp::Draw()
 	glDrawElements(GL_TRIANGLES, box.index_Count, GL_UNSIGNED_INT, 0);
 	box.unbind();
 	circle.bind();
-	glm::mat4 x  = glm::mat4(
+	glm::mat4 x = glm::mat4(
 		glm::cos(.05f), glm::sin(.05f), 0, 0,
 		-glm::sin(.05f), glm::cos(.05f), 0, 0,
 		0, 0, 1, 0,
 		0, 0, 0, 1
-	);
-	glm::mat4 y  = glm::mat4(
-		1,0,0,0,
+		);
+	glm::mat4 y = glm::mat4(
+		1, 0, 0, 0,
 		0, glm::cos(.05f), glm::sin(.05f), 0,
-		0,-glm::sin(.05f), glm::cos(.05f), 0,
-		0,0,0,1
-	);
+		0, -glm::sin(.05f), glm::cos(.05f), 0,
+		0, 0, 0, 1
+		);
 	circleT = circleT * x * y;
-	glUniformMatrix4fv(projectionViewUniform, 1, false, glm::value_ptr(camera->getProjectionView() * circleT ));
+	glUniformMatrix4fv(projectionViewUniform, 1, false, glm::value_ptr(camera->getProjectionView() * circleT));
 	glDrawElements(GL_LINES, circle.index_Count, GL_UNSIGNED_INT, 0);
 	circle.unbind();
 	glUseProgram(0);
