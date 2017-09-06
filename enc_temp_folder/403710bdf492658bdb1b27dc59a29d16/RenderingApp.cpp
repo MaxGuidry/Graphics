@@ -116,6 +116,7 @@ Mesh* RenderingApp::GenSphere(float radius, unsigned verts)
 {
 	std::vector<Vertex> sphereVerts = std::vector<Vertex>();
 	std::vector<unsigned int> sphereIndices = std::vector < unsigned int>();
+	int i = 0;
 	for (float y = radius; y > -radius; y -= radius/(float)verts * 2.f)
 	{
 		float x = glm::sqrt((radius * radius) - (y * y));
@@ -131,10 +132,12 @@ Mesh* RenderingApp::GenSphere(float radius, unsigned verts)
 			vneg.color = glm::vec4(n, y, -z, 1);
 			sphereVerts.push_back(v);
 			sphereVerts.push_back(vneg);
+			i++;
 
 
 		}
 	}
+	std::cout << i << std::endl;
 	sphere->initialize(sphereVerts, std::vector<unsigned int>());
 	return sphere;
 }
