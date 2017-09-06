@@ -3,7 +3,7 @@
 #include <glm/gtc/type_ptr.inl>
 
 
-Mesh::Mesh() : index_Count(0), vertex_Count(0), m_vao(0), m_vbo(0), m_ibo(0)
+Mesh::Mesh() : index_Count(0), vertex_Count(0), m_vao(0), m_vbo(0), m_ibo(0), vertRef(m_vertices)
 {
 }
 

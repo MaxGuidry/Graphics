@@ -5,9 +5,10 @@
 #include <glfw/include/glfw/glfw3.h>
 #include <vector>
 #include "tiny_obj_loader.h"
+#include "Shader.h"
 
 Mesh circle = Mesh();
-Mesh sphere = Mesh();
+Mesh *sphere;
 glm::mat4 grid =
 glm::mat4(
 	1, 0, 0, 0,
@@ -102,7 +103,7 @@ Mesh * RenderingApp::GenGrid(unsigned int rows, unsigned int cols)
 	//}
 #pragma endregion 
 
-		gridMesh->create_buffers();
+	gridMesh->create_buffers();
 	gridMesh->bind();
 	verts.clear();
 	indices.clear();
@@ -111,42 +112,55 @@ Mesh * RenderingApp::GenGrid(unsigned int rows, unsigned int cols)
 	return gridMesh;
 }
 
+Mesh* RenderingApp::GenSphere(float radius, unsigned verts)
+{
+	std::vector<Vertex> sphereVerts = std::vector<Vertex>();
+	std::vector<unsigned int> sphereIndices = std::vector < unsigned int>();
+	for (float y = radius; y > -radius; y -= radius/(float)verts * 2.f)
+	{
+		float x = glm::sqrt((radius * radius) - (y * y));
+		for (float n = x; n > -x; n -= radius/(float)verts * 2.f)
+		{
+			float z = glm::sqrt((x * x) - (n * n));
+
+			Vertex v = Vertex();
+			v.position = glm::vec4(n, y, z,1);
+			v.color = glm::vec4(n, y, z, 1);
+			Vertex vneg = Vertex();
+			vneg.position = glm::vec4(n, y, -z, 1);
+			vneg.color = glm::vec4(n, y, -z, 1);
+			sphereVerts.push_back(v);
+			sphereVerts.push_back(vneg);
+			
+
+
+		}
+	}
+	
+	sphere->initialize(sphereVerts, std::vector<unsigned int>());
+	return sphere;
+}
+
 Mesh box = Mesh();
 
 bool RenderingApp::Start()
 {
 
 	camera->LookAt(glm::vec3(15, 15, 15), glm::vec3(5, 0, 5), glm::vec3(0, 1, 0));
-	const char * vsSource = FileRead("vertex.vert");
-	const char * fsSource = FileRead("fragment.frag");
-	int success = GL_FALSE;
-	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(vertexShader, 1, (const char**)&vsSource, 0);
-	glCompileShader(vertexShader);
-	glShaderSource(fragmentShader, 1, (const char**)&fsSource, 0);
-	glCompileShader(fragmentShader);
-	m_programID = glCreateProgram();
-	glAttachShader(m_programID, vertexShader);
-	glAttachShader(m_programID, fragmentShader);
-	glLinkProgram(m_programID);
-	glGetProgramiv(m_programID, GL_LINK_STATUS, &success);
-	if (success == GL_FALSE)
-	{
-		int infoLogLength = 0;
-		glGetProgramiv(m_programID, GL_INFO_LOG_LENGTH, &infoLogLength);
-		char* infoLog = new char[infoLogLength];
-		glGetProgramInfoLog(m_programID, infoLogLength, 0, infoLog);
-		printf("Error: Failed to link shader program!\n");
-		printf("%s\n", infoLog);
-		delete[] infoLog;
-	}
-	glDeleteShader(fragmentShader);
-	glDeleteShader(vertexShader);
+	
+	m_StandardShaderID = glCreateProgram();
+	
+
+	Shader * vertexShader = new Shader(m_StandardShaderID);
+	vertexShader->load("./vertex.vert", GL_VERTEX_SHADER);
+	vertexShader->attach();
+	Shader * fragShader = new Shader(m_StandardShaderID);
+	fragShader->load("./fragment.frag", GL_FRAGMENT_SHADER);
+	fragShader->attach();
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	delete vsSource;
-	delete fsSource;
+	/*delete vsSource;
+	delete fsSource;*/
 	mesh = GenGrid(3, 3);
 	Vertex a = { glm::vec4(0,0,0,1),glm::vec4(1,1,1,1) };
 	Vertex b = { glm::vec4(1,0,0,1),glm::vec4(1,1,1,1) };
@@ -228,13 +242,9 @@ bool RenderingApp::Start()
 
 
 #pragma region SPHERE
-	std::vector<Vertex> sphereVerts = std::vector<Vertex>();
-	std::vector<unsigned int> sphereIndices = std::vector < unsigned int>();
-	float y = 1.f;
-	float x = 0.f;
-	float z = 0.f;
-
-
+	sphere = new Mesh();
+	sphere = GenSphere(1.f, 50);
+	sphere->create_buffers();
 #pragma endregion
 	box.initialize(boxVerts, boxindeces);
 	box.create_buffers();
@@ -301,9 +311,9 @@ bool RenderingApp::Shutdown()
 bool RenderingApp::Draw()
 {
 	mesh->bind();
-	glUseProgram(m_programID);
-	unsigned int projectionViewUniform = glGetUniformLocation(m_programID, "projectionViewWorldMatrix");
-	unsigned int time = glGetUniformLocation(m_programID, "time");
+	glUseProgram(m_StandardShaderID);
+	unsigned int projectionViewUniform = glGetUniformLocation(m_StandardShaderID, "projectionViewWorldMatrix");
+	unsigned int time = glGetUniformLocation(m_StandardShaderID, "time");
 	glUniform1f(time, glfwGetTime());
 
 	glUniformMatrix4fv(projectionViewUniform, 1, false, glm::value_ptr(camera->getProjectionView()));
@@ -324,17 +334,22 @@ bool RenderingApp::Draw()
 		-glm::sin(.05f), glm::cos(.05f), 0, 0,
 		0, 0, 1, 0,
 		0, 0, 0, 1
-		);
+	);
 	glm::mat4 y = glm::mat4(
 		1, 0, 0, 0,
 		0, glm::cos(.05f), glm::sin(.05f), 0,
 		0, -glm::sin(.05f), glm::cos(.05f), 0,
 		0, 0, 0, 1
-		);
+	);
 	circleT = circleT * x * y;
 	glUniformMatrix4fv(projectionViewUniform, 1, false, glm::value_ptr(camera->getProjectionView() * circleT));
 	glDrawElements(GL_LINES, circle.index_Count, GL_UNSIGNED_INT, 0);
 	circle.unbind();
+	sphere->bind();
+	glm::mat4 scale5 = glm::scale(glm::vec3(5, 5, 5));
+	glUniformMatrix4fv(projectionViewUniform, 1, false, glm::value_ptr(camera->getProjectionView() * glm::translate(glm::vec3(0, -10, 0)) *  scale5));
+	glDrawArrays(GL_POINTS, 0, sphere->vertRef.size());
+	sphere->unbind();
 	glUseProgram(0);
 	return true;
 }

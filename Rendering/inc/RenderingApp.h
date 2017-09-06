@@ -1,6 +1,5 @@
 #pragma once
 #include "Application.h"
-#include <glm/glm.hpp>
 #include "DollyCamera.h"
 #include "Mesh.h"
 
@@ -12,8 +11,8 @@ public:
 	RenderingApp();
 	~RenderingApp();
 	Mesh * GenGrid(unsigned int rows, unsigned int cols);
-	
-	unsigned int m_programID;
+	Mesh * GenSphere(float radius, unsigned int verts);
+	unsigned int m_StandardShaderID;
 	DollyCamera * camera;
 	Mesh * mesh;
 protected:
@@ -22,4 +21,3 @@ protected:
 	bool Shutdown() override;
 	bool Draw() override;
 };
-

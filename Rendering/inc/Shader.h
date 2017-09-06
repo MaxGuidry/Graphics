@@ -3,6 +3,7 @@ class Shader
 {
 public:
 	Shader();
+	Shader(unsigned int programID);
 	~Shader();
 	void bind();
 	void unbind();
@@ -11,11 +12,9 @@ public:
 	void defaultLoad();
 	//void load();
 	unsigned int getUniform(const char *);
-	unsigned int m_vertexShader;
-	unsigned int m_fragmentShader;
-	const char* vsSource;
-	const char* fsSource;
-
+	unsigned int m_Shader;
+	const char* Source;
+	
 
 private:
 	unsigned int m_program;
