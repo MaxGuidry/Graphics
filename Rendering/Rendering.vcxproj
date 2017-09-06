@@ -117,6 +117,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\RenderingApp.cpp" />
     <ClCompile Include="src\Main.cpp" />
@@ -126,6 +127,7 @@
     <ClInclude Include="inc\RenderingApp.h" />
     <ClInclude Include="inc\Mesh.h" />
     <ClInclude Include="inc\tiny_obj_loader.h" />
+    <ClInclude Include="inc\Shader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="bin\vertex.vert" />

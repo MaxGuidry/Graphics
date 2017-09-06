@@ -102,15 +102,6 @@ Mesh * RenderingApp::GenGrid(unsigned int rows, unsigned int cols)
 	//}
 #pragma endregion 
 
-#pragma region SPHERE
-	std::vector<Vertex> sphereVerts = std::vector<Vertex>();
-	std::vector<unsigned int> sphereIndices = std::vector < unsigned int>();
-	float y = 1.f;
-	float x = 0.f;
-	float z = 0.f;
-	
-
-#pragma endregion
 		gridMesh->create_buffers();
 	gridMesh->bind();
 	verts.clear();
@@ -126,8 +117,8 @@ bool RenderingApp::Start()
 {
 
 	camera->LookAt(glm::vec3(15, 15, 15), glm::vec3(5, 0, 5), glm::vec3(0, 1, 0));
-	const char * vsSource = FileRead("./vertex.vert");
-	const char * fsSource = FileRead("./fragment.frag");
+	const char * vsSource = FileRead("vertex.vert");
+	const char * fsSource = FileRead("fragment.frag");
 	int success = GL_FALSE;
 	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -235,6 +226,16 @@ bool RenderingApp::Start()
 
 #pragma endregion 
 
+
+#pragma region SPHERE
+	std::vector<Vertex> sphereVerts = std::vector<Vertex>();
+	std::vector<unsigned int> sphereIndices = std::vector < unsigned int>();
+	float y = 1.f;
+	float x = 0.f;
+	float z = 0.f;
+
+
+#pragma endregion
 	box.initialize(boxVerts, boxindeces);
 	box.create_buffers();
 	box.bind();
