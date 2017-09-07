@@ -116,10 +116,12 @@ Mesh* RenderingApp::GenSphere(float radius, unsigned verts)
 {
 	std::vector<Vertex> sphereVerts = std::vector<Vertex>();
 	std::vector<unsigned int> sphereIndices = std::vector < unsigned int>();
-	for (float y = radius; y > -radius; y -= radius/(float)verts * 2.f)
+
+	//Vertex * verts = new Vertex[];
+	for (float y = radius; y > -radius; y -= (radius/(float)verts) * 2.f)
 	{
 		float x = glm::sqrt((radius * radius) - (y * y));
-		for (float n = x; n > -x; n -= radius/(float)verts * 2.f)
+		for (float n = x; n > -x; n -= (radius/(float)verts) * 2.f)
 		{
 			float z = glm::sqrt((x * x) - (n * n));
 
@@ -134,6 +136,11 @@ Mesh* RenderingApp::GenSphere(float radius, unsigned verts)
 
 
 		}
+		Vertex v = Vertex();
+		v.position = glm::vec4(x, y, 0, 1);
+		v.color = glm::vec4(x, y, 0, 1);
+		Vertex vneg = Vertex();
+		sphereVerts.push_back(v);
 	}
 	sphere->initialize(sphereVerts, std::vector<unsigned int>());
 	return sphere;
@@ -241,7 +248,7 @@ bool RenderingApp::Start()
 
 #pragma region SPHERE
 	sphere = new Mesh();
-	sphere = GenSphere(1.f, 500);
+	sphere = GenSphere(1.f, 10000);
 	sphere->create_buffers();
 #pragma endregion
 	box.initialize(boxVerts, boxindeces);
@@ -346,7 +353,7 @@ bool RenderingApp::Draw()
 	sphere->bind();
 	glm::mat4 scale5 = glm::scale(glm::vec3(5, 5, 5));
 	glUniformMatrix4fv(projectionViewUniform, 1, false, glm::value_ptr(camera->getProjectionView() * glm::translate(glm::vec3(0, -10, 0)) *  scale5));
-	glDrawArrays(GL_POINTS, 0, sphere->vertRef.size());
+	glDrawArrays(GL_LINES, 0, sphere->vertRef.size());
 	sphere->unbind();
 	glUseProgram(0);
 	return true;
