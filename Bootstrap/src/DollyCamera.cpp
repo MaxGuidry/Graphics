@@ -69,14 +69,14 @@ void DollyCamera::LookAt(glm::vec3 eye, glm::vec3 center, glm::vec3 up)
 
 void DollyCamera::setPosition(glm::vec3 position)
 {
-	glm::mat4 t = 
+	glm::mat4 t =
 		glm::mat4(
-			1,0,0,0,
-			0,1,0,0,
-			0,0,1,0,
-			-position.x,-position.y,-position.z,1
-			);
-	
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			-position.x, -position.y, -position.z, 1
+		);
+	this->m_position = this->m_position + position;
 	m_view = m_view * t;
 	//m_position = glm::vec3(m_view[3][0], m_view[3][1], m_view[3][2]);
 	worldTransform = glm::inverse(m_view);
@@ -106,13 +106,13 @@ glm::mat4 DollyCamera::getProjectionView()
 	return m_projection * m_view;
 }
 
-glm::vec3 DollyCamera::RotateAround(glm::vec3 position, glm::vec3 CenterOfOrbit, glm::vec2 deltaMouse,glm::mat4 objMat)
+glm::vec3 DollyCamera::RotateAround(glm::vec3 position, glm::vec3 CenterOfOrbit, glm::vec2 deltaMouse, glm::mat4 objMat)
 {
 	glm::vec3 dist = position - CenterOfOrbit;
 	float mag = glm::sqrt(dist.x * dist.x + dist.y * dist.y + dist.z * dist.z);
 	glm::vec3 mouse3(deltaMouse.x, deltaMouse.y, 0);
-	float xmag = mouse3.x ;
-	float ymag =  mouse3.y;
+	float xmag = mouse3.x;
+	float ymag = mouse3.y;
 	glm::vec3 wup = glm::vec3(0, 1, 0);
 	glm::vec3 right = glm::cross(glm::normalize(dist), wup);
 	float absx = glm::abs(deltaMouse.x);
@@ -125,13 +125,13 @@ glm::vec3 DollyCamera::RotateAround(glm::vec3 position, glm::vec3 CenterOfOrbit,
 		ymag = (ymag * deltaMouse.y) / absy;
 	right = right * xmag;
 	glm::vec3 up = glm::cross(right, glm::normalize(dist));
-	
+
 	up = up * ymag;
 	position += right;
 	position += up;
 	position = glm::normalize(position) * mag;
 	return position;
-	
+
 }
 
 void DollyCamera::LookAround(glm::vec2 deltaMouse)
@@ -215,15 +215,15 @@ void DollyCamera::LookAround(glm::vec2 deltaMouse)
 		x.x, y.x, z.x, 0,
 		x.y, y.y, z.y, 0,
 		x.z, y.z, z.z, 0,
-		0, 0, 0, 1);
+		m_position.x, m_position.y, m_position.z, 1);
 
 
-	glm::mat4 translation = glm::mat4(
+	/*glm::mat4 translation = glm::mat4(
 		1, 0, 0, 0,
 		0, 1, 0, 0,
 		0, 0, 1, 0,
-		-m_position.x, -m_position.y, -m_position.z, 1);
-	m_view = v * translation;
+		0, 0, 0, 1);*/
+	m_view = v;// *translation;
 
 
 	worldTransform = glm::inverse(m_view);

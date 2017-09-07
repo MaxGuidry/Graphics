@@ -11,7 +11,8 @@ public:
 	RenderingApp();
 	~RenderingApp();
 	Mesh * GenGrid(unsigned int rows, unsigned int cols);
-	Mesh * GenSphere(float radius, unsigned int verts);
+	Mesh * GenSphereWithCircleEquation(float radius, unsigned int verts);
+	Mesh * GenSphereWithTrig(float radius, unsigned int circleSize, unsigned int meridians);
 	unsigned int m_StandardShaderID;
 	DollyCamera * camera;
 	Mesh * mesh;

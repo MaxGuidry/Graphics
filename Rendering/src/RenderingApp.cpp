@@ -6,6 +6,9 @@
 #include <vector>
 #include "tiny_obj_loader.h"
 #include "Shader.h"
+#include "gl_core_4_4.h"
+#include "gl_core_4_4.h"
+#include "gl_core_4_4.h"
 
 Mesh circle = Mesh();
 Mesh *sphere;
@@ -112,27 +115,30 @@ Mesh * RenderingApp::GenGrid(unsigned int rows, unsigned int cols)
 	return gridMesh;
 }
 
-Mesh* RenderingApp::GenSphere(float radius, unsigned verts)
+Mesh* RenderingApp::GenSphereWithCircleEquation(float radius, unsigned verts)
 {
 	std::vector<Vertex> sphereVerts = std::vector<Vertex>();
 	std::vector<unsigned int> sphereIndices = std::vector < unsigned int>();
 
 	//Vertex * verts = new Vertex[];
-	for (float y = radius; y > -radius; y -= (radius/(float)verts) * 2.f)
+	for (float y = radius; y > -radius; y -= (radius / (float)verts) * 2.f)
 	{
 		float x = glm::sqrt((radius * radius) - (y * y));
-		for (float n = x; n > -x; n -= (radius/(float)verts) * 2.f)
+		for (float n = x; n > -x; n -= (radius / (float)verts) * 2.f)
 		{
 			float z = glm::sqrt((x * x) - (n * n));
 
 			Vertex v = Vertex();
-			v.position = glm::vec4(n, y, z,1);
-			v.color = glm::vec4(n, y, z, 1);
-			Vertex vneg = Vertex();
-			vneg.position = glm::vec4(n, y, -z, 1);
-			vneg.color = glm::vec4(n, y, -z, 1);
-			sphereVerts.push_back(v);
-			sphereVerts.push_back(vneg);
+			v.position = glm::vec4(n, y, z, 1);
+			v.color = glm::vec4(1, 1, 1, 1);
+			if (z != 0.f)
+			{
+				Vertex vneg = Vertex();
+				vneg.position = glm::vec4(n, y, -z, 1);
+				vneg.color = glm::vec4(1, 1, 1, 1);
+				sphereVerts.push_back(v);
+				sphereVerts.push_back(vneg);
+			}
 
 
 		}
@@ -146,15 +152,123 @@ Mesh* RenderingApp::GenSphere(float radius, unsigned verts)
 	return sphere;
 }
 
+Mesh* RenderingApp::GenSphereWithTrig(float radius, unsigned circleSize, unsigned meridians)
+{
+	std::vector<Vertex> sphereVerts = std::vector<Vertex>();
+	std::vector<unsigned int> sphereIndices = std::vector < unsigned int>();
+	glm::mat4 originCircle = glm::mat4(1);
+	std::vector<Vertex> circleverts = std::vector<Vertex>();
+
+	for (float i = 0; i < circleSize; i++)
+	{
+		float x = glm::cos((i*glm::pi<float>()) / ((float)circleSize - 1));
+		float y = glm::sin((i*glm::pi<float>()) / ((float)circleSize - 1));
+		Vertex v = Vertex();
+		v.position = glm::vec4(x, y, 0, 1);
+		circleverts.push_back(v);
+	}
+	float phi = glm::pi<float>() / (((float)meridians / 2.f));
+	float j = 0;
+	for (int i = 0; i < meridians; i++)
+	{
+
+		for (auto v : circleverts)
+		{
+			Vertex p = Vertex();
+
+			/*	p.position = v.position * glm::mat4(
+						1, 0, 0, 0,
+						0, glm::cos(j*phi), glm::sin(j*phi), 0,
+						0, -glm::sin(j*phi), glm::cos(j*phi), 0,
+						0, 0, 0, 1);*/
+			p.position.x = v.position.x;
+			p.position.y = v.position.y * glm::cos(j*phi) + v.position.z * -glm::sin(j*phi);
+			p.position.z = v.position.y * glm::sin(j*phi) + v.position.z * glm::cos(j*phi);
+			p.position.w = 1.f;
+			p.color = glm::vec4(p.position.x, p.position.y, p.position.z, 1);
+			sphereVerts.push_back(p);
+		}
+		j++;
+	}
+	j = 0;
+	for (int i = 0; i < 1; i++)
+	{
+
+		for (auto v : circleverts)
+		{
+			Vertex p = Vertex();
+			/*	p.position = v.position * glm::mat4(
+			1, 0, 0, 0,
+			0, glm::cos(j*phi), glm::sin(j*phi), 0,
+			0, -glm::sin(j*phi), glm::cos(j*phi), 0,
+			0, 0, 0, 1);*/
+			p.position.x = v.position.x;
+			p.position.y = v.position.y * glm::cos(j*phi) + v.position.z * -glm::sin(j*phi);
+			p.position.z = v.position.y * glm::sin(j*phi) + v.position.z * glm::cos(j*phi);
+			p.position.w = 1.f;
+			p.color = glm::vec4(p.position.x, p.position.y, p.position.z, 1);
+			sphereVerts.push_back(p);
+		}
+		j++;
+	}
+	/*sphereIndices.push_back(0);
+	sphereIndices.push_back(4);
+	sphereIndices.push_back(1);
+	sphereIndices.push_back(2);
+
+	sphereIndices.push_back(2);
+	sphereIndices.push_back(2);
+
+	sphereIndices.push_back(2);
+	sphereIndices.push_back(4);
+	sphereIndices.push_back(7);
+	sphereIndices.push_back(0);
+
+	sphereIndices.push_back(0);
+	sphereIndices.push_back(0);
+
+	sphereIndices.push_back(0);
+	sphereIndices.push_back(1);
+	sphereIndices.push_back(10);
+	sphereIndices.push_back(2);
+
+	sphereIndices.push_back(2);
+	sphereIndices.push_back(2);
+
+	sphereIndices.push_back(2);
+	sphereIndices.push_back(10);
+	sphereIndices.push_back(7);
+	sphereIndices.push_back(0);*/
+
+	for (int i = 0; i < meridians; i++)
+	{
+		for (int j = 0; j < circleSize; j++)
+		{
+			unsigned int left = j + i * circleSize;
+			unsigned int right = j + (i+1) * circleSize;
+
+			sphereIndices.push_back(left);
+			sphereIndices.push_back(right);
+		}
+		sphereIndices.push_back(0xFFFF);
+	}
+	
+	//sphereIndices.push_back(0xFFFFFF);
+	Mesh * sphere = new Mesh();
+	sphere->initialize(sphereVerts, sphereIndices);
+	return sphere;
+}
+
+
 Mesh box = Mesh();
 
 bool RenderingApp::Start()
 {
 
 	camera->LookAt(glm::vec3(15, 15, 15), glm::vec3(5, 0, 5), glm::vec3(0, 1, 0));
-	
+
 	m_StandardShaderID = glCreateProgram();
-	
+
 
 	Shader * vertexShader = new Shader(m_StandardShaderID);
 	vertexShader->load("./vertex.vert", GL_VERTEX_SHADER);
@@ -164,8 +278,7 @@ bool RenderingApp::Start()
 	fragShader->attach();
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	/*delete vsSource;
-	delete fsSource;*/
+
 	mesh = GenGrid(3, 3);
 	Vertex a = { glm::vec4(0,0,0,1),glm::vec4(1,1,1,1) };
 	Vertex b = { glm::vec4(1,0,0,1),glm::vec4(1,1,1,1) };
@@ -248,7 +361,7 @@ bool RenderingApp::Start()
 
 #pragma region SPHERE
 	sphere = new Mesh();
-	sphere = GenSphere(1.f, 10000);
+	sphere = GenSphereWithTrig(1.f, 500, 900);
 	sphere->create_buffers();
 #pragma endregion
 	box.initialize(boxVerts, boxindeces);
@@ -276,7 +389,7 @@ bool RenderingApp::Update(float deltaTime)
 	glm::vec2 cpos = glm::vec2(mousex, mousey);
 
 	glm::vec2 deltaMouse = glm::vec2(mousex - pmouseX, mousey - pmouseY);
-	deltaMouse = deltaMouse * deltaTime * 15.f;
+	deltaMouse = deltaMouse * deltaTime * 5.f;
 
 	if (glfwGetMouseButton(window, 0))
 		camera->LookAround(deltaMouse);
@@ -352,8 +465,13 @@ bool RenderingApp::Draw()
 	circle.unbind();
 	sphere->bind();
 	glm::mat4 scale5 = glm::scale(glm::vec3(5, 5, 5));
-	glUniformMatrix4fv(projectionViewUniform, 1, false, glm::value_ptr(camera->getProjectionView() * glm::translate(glm::vec3(0, -10, 0)) *  scale5));
-	glDrawArrays(GL_LINES, 0, sphere->vertRef.size());
+	glUniformMatrix4fv(projectionViewUniform, 1, false, glm::value_ptr(camera->getProjectionView() * glm::translate(glm::vec3(0, -10, 0))  * scale5));
+	glDrawArrays(GL_POINTS, 0, sphere->vertRef.size());
+	glEnable(GL_PRIMITIVE_RESTART);
+	glPrimitiveRestartIndex(0xFFFF);
+	//glDrawElements(GL_TRIANGLE_STRIP, sphere->index_Count, GL_UNSIGNED_INT, 0);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glDisable(GL_PRIMITIVE_RESTART);
 	sphere->unbind();
 	glUseProgram(0);
 	return true;
