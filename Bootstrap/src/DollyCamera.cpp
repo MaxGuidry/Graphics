@@ -215,16 +215,15 @@ void DollyCamera::LookAround(glm::vec2 deltaMouse)
 		x.x, y.x, z.x, 0,
 		x.y, y.y, z.y, 0,
 		x.z, y.z, z.z, 0,
-		m_position.x, m_position.y, m_position.z, 1);
-
-
-	/*glm::mat4 translation = glm::mat4(
+		0, 0, 0, 1);
+	//m_view[3][0], m_view[3][1], m_view[3][2]
+	glm::mat4 translation = glm::mat4(
 		1, 0, 0, 0,
 		0, 1, 0, 0,
 		0, 0, 1, 0,
-		0, 0, 0, 1);*/
-	m_view = v;// *translation;
-
+		0, 0, 0, 1);
+	m_view = v *translation;
+	this->LookAt(m_position, m_position - glm::vec3(m_view[0][2], m_view[1][2], m_view[2][2]), glm::vec3(0, 1, 0));
 
 	worldTransform = glm::inverse(m_view);
 }

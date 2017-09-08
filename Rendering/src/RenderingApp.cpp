@@ -161,8 +161,8 @@ Mesh* RenderingApp::GenSphereWithTrig(float radius, unsigned circleSize, unsigne
 
 	for (float i = 0; i < circleSize; i++)
 	{
-		float x = glm::cos((i*glm::pi<float>()) / ((float)circleSize - 1));
-		float y = glm::sin((i*glm::pi<float>()) / ((float)circleSize - 1));
+		float x = radius *glm::cos((i*glm::pi<float>()) / ((float)circleSize - 1));
+		float y = radius *glm::sin((i*glm::pi<float>()) / ((float)circleSize - 1));
 		Vertex v = Vertex();
 		v.position = glm::vec4(x, y, 0, 1);
 		circleverts.push_back(v);
@@ -242,10 +242,11 @@ Mesh* RenderingApp::GenSphereWithTrig(float radius, unsigned circleSize, unsigne
 
 	for (int i = 0; i < meridians; i++)
 	{
+		float botLeft = i*circleSize;
 		for (int j = 0; j < circleSize; j++)
 		{
-			unsigned int left = j + i * circleSize;
-			unsigned int right = j + (i+1) * circleSize;
+			unsigned int left = j + botLeft;
+			unsigned int right = left + circleSize;
 
 			sphereIndices.push_back(left);
 			sphereIndices.push_back(right);
@@ -361,7 +362,7 @@ bool RenderingApp::Start()
 
 #pragma region SPHERE
 	sphere = new Mesh();
-	sphere = GenSphereWithTrig(1.f, 500, 900);
+	sphere = GenSphereWithTrig(1.f, 7, 5);
 	sphere->create_buffers();
 #pragma endregion
 	box.initialize(boxVerts, boxindeces);
@@ -389,7 +390,7 @@ bool RenderingApp::Update(float deltaTime)
 	glm::vec2 cpos = glm::vec2(mousex, mousey);
 
 	glm::vec2 deltaMouse = glm::vec2(mousex - pmouseX, mousey - pmouseY);
-	deltaMouse = deltaMouse * deltaTime * 5.f;
+	deltaMouse = deltaMouse * deltaTime * 3.f;
 
 	if (glfwGetMouseButton(window, 0))
 		camera->LookAround(deltaMouse);
@@ -417,7 +418,7 @@ bool RenderingApp::Update(float deltaTime)
 	}
 	pmouseX = mousex;
 	pmouseY = mousey;
-
+	std::cout << camera->m_position.x << "," << camera->m_position.y << "," << camera->m_position.z << std::endl;
 	return true;
 }
 
@@ -466,11 +467,11 @@ bool RenderingApp::Draw()
 	sphere->bind();
 	glm::mat4 scale5 = glm::scale(glm::vec3(5, 5, 5));
 	glUniformMatrix4fv(projectionViewUniform, 1, false, glm::value_ptr(camera->getProjectionView() * glm::translate(glm::vec3(0, -10, 0))  * scale5));
-	glDrawArrays(GL_POINTS, 0, sphere->vertRef.size());
+	//glDrawArrays(GL_POINTS, 0, sphere->vertRef.size());
 	glEnable(GL_PRIMITIVE_RESTART);
 	glPrimitiveRestartIndex(0xFFFF);
-	//glDrawElements(GL_TRIANGLE_STRIP, sphere->index_Count, GL_UNSIGNED_INT, 0);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glDrawElements(GL_TRIANGLE_STRIP, sphere->index_Count, GL_UNSIGNED_INT, 0);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glDisable(GL_PRIMITIVE_RESTART);
 	sphere->unbind();
 	glUseProgram(0);
