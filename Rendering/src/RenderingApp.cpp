@@ -415,7 +415,6 @@ bool RenderingApp::Update(float deltaTime)
 	}
 	pmouseX = mousex;
 	pmouseY = mousey;
-	std::cout << camera->m_position.x << "," << camera->m_position.y << "," << camera->m_position.z << std::endl;
 	
 	return true;
 }
