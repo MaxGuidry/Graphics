@@ -1,14 +1,11 @@
 #include "RenderingApp.h"
-#include"ReadFile.h"
 #include<glm/ext.hpp>
 #include <gl_core_4_4.h>
 #include <glfw/include/glfw/glfw3.h>
 #include <vector>
 #include "tiny_obj_loader.h"
 #include "Shader.h"
-#include "gl_core_4_4.h"
-#include "gl_core_4_4.h"
-#include "gl_core_4_4.h"
+
 
 Mesh circle = Mesh();
 Mesh *sphere;
@@ -419,6 +416,7 @@ bool RenderingApp::Update(float deltaTime)
 	pmouseX = mousex;
 	pmouseY = mousey;
 	std::cout << camera->m_position.x << "," << camera->m_position.y << "," << camera->m_position.z << std::endl;
+	
 	return true;
 }
 
