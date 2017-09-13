@@ -18,7 +18,10 @@ public:
 	void unbind();
 	unsigned int index_Count;
 	unsigned int vertex_Count;
-	std::vector<Vertex>& vertRef;
+	const std::vector<Vertex>& vertRef;
+	const std::vector<unsigned int>& indicesRef;
+	std::vector<Vertex>getVerts();
+	std::vector<unsigned int>getIndices();
 private:
 	unsigned int m_vao;
 	unsigned int m_vbo;

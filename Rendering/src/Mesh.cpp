@@ -3,7 +3,7 @@
 #include <glm/gtc/type_ptr.inl>
 
 
-Mesh::Mesh() : index_Count(0), vertex_Count(0), m_vao(0), m_vbo(0), m_ibo(0), vertRef(m_vertices)
+Mesh::Mesh() : index_Count(0), vertex_Count(0), m_vao(0), m_vbo(0), m_ibo(0), vertRef(m_vertices),indicesRef(m_indices)
 {
 }
 
@@ -56,4 +56,14 @@ void Mesh::bind()
 void Mesh::unbind()
 {
 	glBindVertexArray(0); 
+}
+
+std::vector<Vertex> Mesh::getVerts()
+{
+	return this->m_vertices;
+}
+
+std::vector<unsigned> Mesh::getIndices()
+{
+	return this->m_indices;
 }
