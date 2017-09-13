@@ -6,7 +6,21 @@
 #include "tiny_obj_loader.h"
 #include "Shader.h"
 
+std::vector<glm::vec4> HalfCircle(float radius, unsigned int size);
+std::vector<glm::vec4> GenSphereVerts(std::vector<glm::vec4> halfCircle, unsigned int meridians);
+std::vector<glm::vec4> HalfCircle(float radius, unsigned int size)
+{
+	std::vector<glm::vec4> circleverts = std::vector<glm::vec4>();
 
+	for (float i = 0; i < size; i++)
+	{
+		float x = radius *glm::cos((i*glm::pi<float>()) / ((float)size - 1));
+		float y = radius *glm::sin((i*glm::pi<float>()) / ((float)size - 1));
+		
+		circleverts.push_back(glm::vec4(x, y, 0, 1));
+	}
+	return circleverts;
+}
 Mesh circle = Mesh();
 Mesh *sphere;
 glm::mat4 grid =
@@ -71,38 +85,6 @@ Mesh * RenderingApp::GenGrid(unsigned int rows, unsigned int cols)
 
 	Mesh * gridMesh = new Mesh();
 	gridMesh->initialize(verts, indices);
-
-#pragma region circle
-	//Vertex * aoVerts = new Vertex[100];
-	//unsigned int * auiIndices = new unsigned int[200];
-
-	//unsigned int i = 0;
-	//unsigned int ai =0;
-	//for (float x = -2.f; x < 2.f; x += .08f)
-	//{
-	//	aoVerts[i].position = glm::vec4(x, 0, glm::sqrt(4.f - x*x), 1);
-	//	//std::cout << x << std::endl;
-	//	//std::cout << aoVerts[i].position.x << "," << aoVerts[i].position.y << "," << aoVerts[i].position.z << std::endl;
-	//	auiIndices[ai] = i;
-	//	ai++;
-	//	auiIndices[ai] = i;
-	//	ai++;
-	//	i++;
-	//}
-
-	//for (float x = 2.f; x > -2.f; x -= .08f)
-	//{
-	//	aoVerts[i].position = glm::vec4(x, 0, -glm::sqrt(4.f - x*x), 1);
-	//	//std::cout << x << std::endl;
-	//	//std::cout << aoVerts[i].position.x << "," << aoVerts[i].position.y << "," << aoVerts[i].position.z << std::endl;
-	//	auiIndices[ai] = i;
-	//	ai++;
-	//	auiIndices[ai] = i;
-	//	ai++;
-	//	i++;
-	//}
-#pragma endregion 
-
 	gridMesh->create_buffers();
 	gridMesh->bind();
 	verts.clear();
@@ -149,27 +131,18 @@ Mesh* RenderingApp::GenSphereWithCircleEquation(float radius, unsigned verts)
 	return sphere;
 }
 
-Mesh* RenderingApp::GenSphereWithTrig(float radius, unsigned circleSize, unsigned meridians)
+std::vector<glm::vec4> GenSphereVerts(std::vector<glm::vec4> halfCircle, unsigned int meridians)
 {
 	std::vector<Vertex> sphereVerts = std::vector<Vertex>();
 	std::vector<unsigned int> sphereIndices = std::vector < unsigned int>();
 	glm::mat4 originCircle = glm::mat4(1);
-	std::vector<Vertex> circleverts = std::vector<Vertex>();
-
-	for (float i = 0; i < circleSize; i++)
-	{
-		float x = radius *glm::cos((i*glm::pi<float>()) / ((float)circleSize - 1));
-		float y = radius *glm::sin((i*glm::pi<float>()) / ((float)circleSize - 1));
-		Vertex v = Vertex();
-		v.position = glm::vec4(x, y, 0, 1);
-		circleverts.push_back(v);
-	}
+	
 	float phi = glm::pi<float>() / (((float)meridians / 2.f));
 	float j = 0;
 	for (int i = 0; i < meridians; i++)
 	{
 
-		for (auto v : circleverts)
+		for (auto v : halfCircle)
 		{
 			Vertex p = Vertex();
 
@@ -178,20 +151,20 @@ Mesh* RenderingApp::GenSphereWithTrig(float radius, unsigned circleSize, unsigne
 						0, glm::cos(j*phi), glm::sin(j*phi), 0,
 						0, -glm::sin(j*phi), glm::cos(j*phi), 0,
 						0, 0, 0, 1);*/
-			p.position.x = v.position.x;
-			p.position.y = v.position.y * glm::cos(j*phi) + v.position.z * -glm::sin(j*phi);
-			p.position.z = v.position.y * glm::sin(j*phi) + v.position.z * glm::cos(j*phi);
+			p.position.x = v.x;
+			p.position.y = v.y * glm::cos(j*phi) + v.z * -glm::sin(j*phi);
+			p.position.z = v.y * glm::sin(j*phi) + v.z * glm::cos(j*phi);
 			p.position.w = 1.f;
 			p.color = glm::vec4(p.position.x, p.position.y, p.position.z, 1);
 			sphereVerts.push_back(p);
 		}
 		j++;
 	}
-	j = 0;
+	
 	for (int i = 0; i < 1; i++)
 	{
 
-		for (auto v : circleverts)
+		for (auto v : halfCircle)
 		{
 			Vertex p = Vertex();
 			/*	p.position = v.position * glm::mat4(
@@ -200,13 +173,13 @@ Mesh* RenderingApp::GenSphereWithTrig(float radius, unsigned circleSize, unsigne
 			0, -glm::sin(j*phi), glm::cos(j*phi), 0,
 			0, 0, 0, 1);*/
 			p.position.x = v.position.x;
-			p.position.y = v.position.y * glm::cos(j*phi) + v.position.z * -glm::sin(j*phi);
-			p.position.z = v.position.y * glm::sin(j*phi) + v.position.z * glm::cos(j*phi);
+			p.position.y = v.position.y * glm::cos(i*phi) + v.position.z * -glm::sin(i*phi);
+			p.position.z = v.position.y * glm::sin(i*phi) + v.position.z * glm::cos(i*phi);
 			p.position.w = 1.f;
 			p.color = glm::vec4(p.position.x, p.position.y, p.position.z, 1);
 			sphereVerts.push_back(p);
 		}
-		j++;
+		
 	}
 	/*sphereIndices.push_back(0);
 	sphereIndices.push_back(4);
@@ -287,7 +260,6 @@ bool RenderingApp::Start()
 	Vertex g = { glm::vec4(0,0,1,1),glm::vec4(1,1,1,1) };
 	Vertex h = { glm::vec4(1,0,1,1),glm::vec4(1,1,1,1) };
 
-
 	std::vector<Vertex> boxVerts{ a,b,c,d,e,f,g,h };
 	std::vector<unsigned int> boxindeces
 	{
@@ -359,7 +331,7 @@ bool RenderingApp::Start()
 
 #pragma region SPHERE
 	sphere = new Mesh();
-	sphere = GenSphereWithTrig(1.f, 7, 5);
+	sphere = GenSphereVerts(1.f, 50, 50);
 	sphere->create_buffers();
 #pragma endregion
 	box.initialize(boxVerts, boxindeces);
@@ -409,7 +381,6 @@ bool RenderingApp::Update(float deltaTime)
 	}
 	if (glfwGetKey(window, GLFW_KEY_A))
 	{
-
 		glm::vec3 right = glm::vec3(camera->m_view[0][0], camera->m_view[1][0], camera->m_view[2][0]);
 		camera->setPosition(-right);
 	}
@@ -451,13 +422,13 @@ bool RenderingApp::Draw()
 		0, 0, 1, 0,
 		0, 0, 0, 1
 	);
-	glm::mat4 y = glm::mat4(
+	glm::mat4 z = glm::mat4(
 		1, 0, 0, 0,
 		0, glm::cos(.05f), glm::sin(.05f), 0,
 		0, -glm::sin(.05f), glm::cos(.05f), 0,
 		0, 0, 0, 1
 	);
-	circleT = circleT * x * y;
+	circleT = circleT * x * z;
 	glUniformMatrix4fv(projectionViewUniform, 1, false, glm::value_ptr(camera->getProjectionView() * circleT));
 	glDrawElements(GL_LINES, circle.index_Count, GL_UNSIGNED_INT, 0);
 	circle.unbind();
@@ -468,7 +439,7 @@ bool RenderingApp::Draw()
 	glEnable(GL_PRIMITIVE_RESTART);
 	glPrimitiveRestartIndex(0xFFFF);
 	glDrawElements(GL_TRIANGLE_STRIP, sphere->index_Count, GL_UNSIGNED_INT, 0);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glDisable(GL_PRIMITIVE_RESTART);
 	sphere->unbind();
 	glUseProgram(0);
