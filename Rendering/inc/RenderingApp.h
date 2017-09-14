@@ -20,4 +20,5 @@ protected:
 	bool Update(float deltaTime) override;
 	bool Shutdown() override;
 	bool Draw() override;
+	bool m_fill;
 };

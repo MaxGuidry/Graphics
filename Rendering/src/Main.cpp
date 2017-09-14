@@ -1,4 +1,3 @@
-#include"CameraApp.h"
 #include "RenderingApp.h"
 
 int main()

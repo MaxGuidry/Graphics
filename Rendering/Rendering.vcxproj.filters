@@ -21,13 +21,7 @@
     <ClCompile Include="src\RenderingApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Source.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -38,13 +32,7 @@
     <ClInclude Include="inc\RenderingApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="inc\tiny_obj_loader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
