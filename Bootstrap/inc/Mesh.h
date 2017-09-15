@@ -8,7 +8,9 @@ struct Vertex
 	glm::vec4 position;
 	glm::vec4 color;
 	glm::vec4 normal;
-	glm::vec2 uv;
+	glm::vec2 texcoord;
+	glm::vec4 tangent;
+	glm::vec4 bitangent;
 };
 class Mesh
 {
@@ -26,6 +28,10 @@ public:
 	const std::vector<unsigned int>& indicesRef;
 	std::vector<Vertex>getVerts();
 	std::vector<unsigned int>getIndices();
+	unsigned int * vaoptr;
+	unsigned int * vboptr;
+	unsigned int * iboptr;
+	
 private:
 	unsigned int m_vao;
 	unsigned int m_vbo;

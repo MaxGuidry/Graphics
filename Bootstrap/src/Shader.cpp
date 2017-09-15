@@ -63,5 +63,5 @@ void Shader::defaultLoad()
 
 unsigned Shader::getUniform(const char* name)
 {
-	return 0;
+	return glGetUniformLocation(m_program, name);
 }

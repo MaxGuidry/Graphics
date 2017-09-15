@@ -3,9 +3,8 @@
 #include <glm/gtc/type_ptr.inl>
 
 
-Mesh::Mesh() : index_Count(0), vertex_Count(0), m_vao(0), m_vbo(0), m_ibo(0), vertRef(m_vertices), indicesRef(m_indices)
+Mesh::Mesh() : index_Count(0), vertex_Count(0), m_vao(0), m_vbo(0), m_ibo(0), vertRef(m_vertices), indicesRef(m_indices),vboptr(&m_vbo),vaoptr(&m_vbo),iboptr(&m_ibo)
 {
-	printf("create mesh");
 }
 
 
