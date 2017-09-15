@@ -25,19 +25,20 @@ bool LightingApp::Start()
 {
 	camera->LookAt(glm::vec3(10, 10, 10), glm::vec3(0), glm::vec3(0, 1, 0));
 	
-	//Mesh tmp = MaxGizmos::GenSphere(1.f, 32, 32);
-	//m_sphere.initialize(tmp.getVerts(), tmp.getIndices());
-	//m_sphere.create_buffers();
+	Mesh tmp = MaxGizmos::GenSphere(1.f, 30, 30);
+	m_sphere.initialize(tmp.getVerts(), tmp.getIndices());
+	m_sphere.create_buffers();
+
 	m_directLight.diffuse = glm::vec3(1);
 	m_directLight.specular = glm::vec3(1);
-	m_ambientLight = glm::vec3(0.25f);
+	m_ambientLight = glm::vec3(.25f);
 
-	m_material.diffuse = glm::vec3(1);
-	m_material.ambient = glm::vec3(1);
-	m_material.specular = glm::vec3(1);
+	m_material.diffuse = glm::vec3(1,0,0);
+	m_material.ambient = glm::vec3(1,0,0);
+	m_material.specular = glm::vec3(1,0,0);
 
-	m_material.specularPower = 64;
-	generateSphere(32, 32, vao, vbo, ibo, indexcount);
+	m_material.specularPower = 4;
+	//generateSphere(32, 32, vao, vbo, ibo, indexcount);
 	
 	m_PhongShader = glCreateProgram();
 	vert = Shader(m_PhongShader);
@@ -68,7 +69,7 @@ bool LightingApp::Update(float deltaTime)
 	glm::vec2 cpos = glm::vec2(mousex, mousey);
 
 	glm::vec2 deltaMouse = glm::vec2(mousex - pmouseX, mousey - pmouseY);
-	deltaMouse = deltaMouse * deltaTime * 3.f;
+	deltaMouse = deltaMouse * deltaTime * 1.f;
 
 	if (glfwGetMouseButton(window, 0))
 		camera->LookAround(deltaMouse);
@@ -76,22 +77,22 @@ bool LightingApp::Update(float deltaTime)
 	if (glfwGetKey(window, GLFW_KEY_D))
 	{
 		glm::vec3 right = glm::vec3(camera->m_view[0][0], camera->m_view[1][0], camera->m_view[2][0]);
-		camera->setPosition(right);
+		camera->setPosition(right * .25f);
 	}
 	if (glfwGetKey(window, GLFW_KEY_W))
 	{
 		glm::vec3 forward = glm::vec3(camera->m_view[0][2], camera->m_view[1][2], camera->m_view[2][2]);
-		camera->setPosition(-forward);
+		camera->setPosition(-forward* .25f);
 	}
 	if (glfwGetKey(window, GLFW_KEY_S))
 	{
 		glm::vec3 forward = glm::vec3(camera->m_view[0][2], camera->m_view[1][2], camera->m_view[2][2]);
-		camera->setPosition(forward);
+		camera->setPosition(forward* .25f);
 	}
 	if (glfwGetKey(window, GLFW_KEY_A))
 	{
 		glm::vec3 right = glm::vec3(camera->m_view[0][0], camera->m_view[1][0], camera->m_view[2][0]);
-		camera->setPosition(-right);
+		camera->setPosition(-right* .25f);
 	}
 	pmouseX = mousex;
 	pmouseY = mousey;
@@ -111,7 +112,9 @@ bool LightingApp::Update(float deltaTime)
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	float time = glfwGetTime();
-	m_directLight.direction = glm::vec3(sin(time), 0, cos(time));
+	m_directLight.direction = glm::normalize(glm::vec3(-10.f, -7.f, -10.f));
+	//m_directLight.diffuse = glm::vec3(sin(time), sin(2.f*time), cos(time));
+	//m_directLight.direction = glm::normalize(glm::vec3(sin(time), -5.f, cos(time)));
 	return true;
 }
 
@@ -125,21 +128,37 @@ bool LightingApp::Draw()
 {
 
 	glUseProgram(m_PhongShader);
-	//m_sphere.bind();
+	m_sphere.bind();
 	unsigned int pvU = vert.getUniform("ProjectionViewModel");
 	glUniformMatrix4fv(pvU, 1, false, glm::value_ptr(camera->getProjectionView()));
 	int lightUniform = frag.getUniform("direction");
-	glUniform3fv(lightUniform, 1, &m_directLight.direction[0]);
+	glUniform3fv(lightUniform, 1, glm::value_ptr(m_directLight.direction));
 
 	lightUniform = frag.getUniform("Id");
-	glUniform3fv(lightUniform, 1, &m_directLight.diffuse[0]);
+	glUniform3fv(lightUniform, 1, glm::value_ptr(m_directLight.diffuse));
 
 	lightUniform = frag.getUniform("Ia");
-	glUniform3fv(lightUniform, 1, &m_ambientLight[0]);
-	glBindVertexArray(vao);
-	glDrawElements(GL_TRIANGLES, indexcount, GL_UNSIGNED_INT, 0);
-	//m_sphere.draw(GL_TRIANGLES);
-	//m_sphere.unbind();
+	glUniform3fv(lightUniform, 1, glm::value_ptr(m_ambientLight));
+
+	lightUniform = frag.getUniform("Ka");
+	glUniform3fv(lightUniform, 1, glm::value_ptr(m_material.ambient));
+
+	lightUniform = frag.getUniform("Ks");
+	glUniform3fv(lightUniform, 1, glm::value_ptr(m_material.specular));
+
+	lightUniform = frag.getUniform("Is");
+	glUniform3fv(lightUniform, 1, glm::value_ptr(m_directLight.specular));
+
+	lightUniform = frag.getUniform("a");
+	glUniform1f(lightUniform, m_material.specularPower);
+
+	lightUniform = frag.getUniform("camforward");
+	//glUniform3fv(lightUniform, 1, glm::value_ptr(glm::vec3(camera->getView()[3][0], camera->getView()[3][1], camera->getView()[3][2])));
+	glUniform3fv(lightUniform, 1, glm::value_ptr(camera->m_position));
+	//glBindVertexArray(vao);
+	//glDrawElements(GL_TRIANGLES, indexcount, GL_UNSIGNED_INT, 0);
+	m_sphere.draw(GL_TRIANGLE_STRIP);
+	m_sphere.unbind();
 	glUseProgram(0);
 
 	return true;

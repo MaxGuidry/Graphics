@@ -16,5 +16,6 @@ private:
 	static std::vector<glm::vec4> HalfCircle(float radius, unsigned int size);
 	static std::vector<glm::vec4> GenSphereVerts(std::vector<glm::vec4> halfCircle, unsigned int meridians);
 	static std::vector<unsigned int> GenSphereIndices(unsigned int size, unsigned int meridians);
+	static std::vector<glm::vec2> GenSphereUV(unsigned int circleize, unsigned int meridians);
 };
 

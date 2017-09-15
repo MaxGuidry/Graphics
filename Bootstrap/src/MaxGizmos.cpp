@@ -94,6 +94,19 @@ std::vector<unsigned int> MaxGizmos::GenSphereIndices(unsigned int size, unsigne
 	}
 	return sphereIndices;
 }
+std::vector<glm::vec2> MaxGizmos::GenSphereUV(unsigned int circleize, unsigned int meridians)
+{
+	std::vector<glm::vec2> uvs = std::vector<glm::vec2>();
+	for (unsigned int ring = 0; ring < (circleize + 2); ++ring)
+	{
+		for (unsigned int segment = 0; segment < (meridians + 1); ++segment)
+		{
+			uvs.push_back(glm::vec2(segment / (float)meridians, ring / (float)(circleize + 1)));
+		}
+
+	}
+	return uvs;
+}
 Mesh MaxGizmos::GenSphere(float radius, unsigned int circleSize, unsigned int meridians)
 {
 
@@ -101,10 +114,21 @@ Mesh MaxGizmos::GenSphere(float radius, unsigned int circleSize, unsigned int me
 	std::vector<glm::vec4> hc = HalfCircle(radius, circleSize);
 	std::vector<glm::vec4> positions = GenSphereVerts(hc, meridians);
 	std::vector<unsigned int> indices = GenSphereIndices(circleSize, meridians);
+	std::vector<glm::vec2> uvs = GenSphereUV(circleSize, meridians);
+	
 	Mesh s = Mesh();
+	unsigned int uvindex = 0;
 	for (auto v : positions)
-		sphereverts.push_back(Vertex{ v,v });
+	{
+		Vertex vert = Vertex();
+		vert.position = v;
+		vert.color = glm::vec4(0);
+		vert.normal = glm::normalize(glm::vec4(v.x, v.y, v.z, 0));
+		vert.tangent = glm::vec4(glm::cross(glm::vec3(0, 1, 0), glm::vec3(vert.normal.x,vert.normal.y,vert.normal.z)),1);
+		vert.texcoord = uvs[uvindex];
+		uvindex++;
+		sphereverts.push_back(vert);
+	}
 	s.initialize(sphereverts, indices);
-	s.create_buffers();
 	return s;
 }
