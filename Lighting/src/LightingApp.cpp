@@ -29,8 +29,8 @@ bool LightingApp::Start()
 	m_sphere.initialize(tmp.getVerts(), tmp.getIndices());
 	m_sphere.create_buffers();
 
-	m_directLight.diffuse = glm::vec3(1);
-	m_directLight.specular = glm::vec3(1);
+	m_directLight.diffuse = glm::vec3(0,1,0);
+	m_directLight.specular = glm::vec3(0,0,1);
 	m_ambientLight = glm::vec3(.25f);
 
 	m_material.diffuse = glm::vec3(1,0,0);

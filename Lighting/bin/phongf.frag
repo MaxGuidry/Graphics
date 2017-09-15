@@ -25,10 +25,10 @@ out vec4 FragColor;
 
 void main()
 {
-	float lambertTerm = max(0, dot(vec4(-direction, 1), vNormal));	
+	float lambertTerm = max(0, dot(-direction, vec3(vNormal)));	
 	vec3 reflectedRay = reflect(-direction, vec3(vNormal));
 	vec3 E = normalize(camforward - vec3(vPosition));
 	float DotRV = min(dot(reflectedRay, E),0.0f);
 	float rvToa = pow(DotRV, a);
-	FragColor = vec4(Ka,1)*vec4(Ia,1) + vec4(Id,1) * lambertTerm + vec4(Ks,1) * rvToa * vec4(Is,1);
+	FragColor = vec4((Ka*Ia) + (Id* lambertTerm) + (Ks * rvToa * Is),1);
 }
