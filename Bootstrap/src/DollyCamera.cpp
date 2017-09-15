@@ -4,7 +4,7 @@
 #include "glm/glm.hpp"
 #include <iostream>
 
-DollyCamera::DollyCamera() : m_position(10, 10, 10), m_view(glm::mat4(1)), focus(0, 0, 0), m_fov(glm::pi<float>() / 4.f), m_aspectRatio(16.f / 9.f), m_near(.1f), m_far(1000.f), worldTransform(glm::mat4(1)), m_projection(glm::mat4(1)), projectionViewTransform(glm::mat4(1))
+DollyCamera::DollyCamera() : m_position(5, 5, 5), m_view(glm::mat4(1)), focus(0, 0, 0), m_fov(glm::pi<float>() / 4.f), m_aspectRatio(16.f / 9.f), m_near(.1f), m_far(1000.f), worldTransform(glm::mat4(1)), m_projection(glm::mat4(1)), projectionViewTransform(glm::mat4(1))
 {
 
 	setPerspective(glm::pi<float>() / 4.f, 16.f / 9.f, 0.1f, 1000.f);

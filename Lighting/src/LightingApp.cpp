@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include "Shader.h"
 #include <MaxGizmos.h>
+#include <tiny_obj_loader.h>
+
 
 Shader frag;
 Shader vert;
@@ -23,22 +25,22 @@ LightingApp::~LightingApp()
 
 bool LightingApp::Start()
 {
-	camera->LookAt(glm::vec3(10, 10, 10), glm::vec3(0), glm::vec3(0, 1, 0));
+	camera->LookAt(camera->m_position, glm::vec3(0), glm::vec3(0, 1, 0));
 	
-	Mesh tmp = MaxGizmos::GenSphere(1.f, 30, 30);
-	m_sphere.initialize(tmp.getVerts(), tmp.getIndices());
-	m_sphere.create_buffers();
+	//Mesh tmp = MaxGizmos::GenSphere(1.f, 32, 32);
+	//m_sphere.initialize(tmp.getVerts(), tmp.getIndices());
+	//m_sphere.create_buffers();
 
 	m_directLight.diffuse = glm::vec3(0,1,0);
-	m_directLight.specular = glm::vec3(0,0,1);
-	m_ambientLight = glm::vec3(.25f);
+	m_directLight.specular = glm::vec3(1);
+	m_ambientLight = glm::vec3(0,.25f,0);
 
-	m_material.diffuse = glm::vec3(1,0,0);
-	m_material.ambient = glm::vec3(1,0,0);
-	m_material.specular = glm::vec3(1,0,0);
+	m_material.diffuse = glm::vec3(1);
+	m_material.ambient = glm::vec3(1);
+	m_material.specular = glm::vec3(1);
 
-	m_material.specularPower = 4;
-	//generateSphere(32, 32, vao, vbo, ibo, indexcount);
+	m_material.specularPower = 30;
+	generateSphere(100, 100, vao, vbo, ibo, indexcount);
 	
 	m_PhongShader = glCreateProgram();
 	vert = Shader(m_PhongShader);
@@ -112,9 +114,21 @@ bool LightingApp::Update(float deltaTime)
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	float time = glfwGetTime();
-	m_directLight.direction = glm::normalize(glm::vec3(-10.f, -7.f, -10.f));
+	m_directLight.direction = glm::normalize(glm::vec3(-1,-1,-1));
+	if (glfwGetKey(window, GLFW_KEY_UP))
+		m_material.specularPower+=.2f;
+	if (glfwGetKey(window, GLFW_KEY_DOWN))
+		m_material.specularPower-=.2f;
+	//std::cout << m_material.specularPower << std::endl;
+	m_directLight.direction = glm::normalize(glm::vec3(10, 10, 10));
 	//m_directLight.diffuse = glm::vec3(sin(time), sin(2.f*time), cos(time));
-	//m_directLight.direction = glm::normalize(glm::vec3(sin(time), -5.f, cos(time)));
+	//m_directLight.direction = glm::normalize(glm::vec3(sin(time/2.f), 0, cos(time/2.f)));
+	if(glfwGetKey(window,GLFW_KEY_F5))
+	{
+
+		frag.reload("./phongf.frag", GL_FRAGMENT_SHADER);
+		frag.attach();
+	}
 	return true;
 }
 
@@ -128,9 +142,9 @@ bool LightingApp::Draw()
 {
 
 	glUseProgram(m_PhongShader);
-	m_sphere.bind();
+	//m_sphere.bind();
 	unsigned int pvU = vert.getUniform("ProjectionViewModel");
-	glUniformMatrix4fv(pvU, 1, false, glm::value_ptr(camera->getProjectionView()));
+	glUniformMatrix4fv(pvU, 1, false, glm::value_ptr(camera->getProjectionView() * glm::scale(glm::vec3(5))));
 	int lightUniform = frag.getUniform("direction");
 	glUniform3fv(lightUniform, 1, glm::value_ptr(m_directLight.direction));
 
@@ -146,6 +160,9 @@ bool LightingApp::Draw()
 	lightUniform = frag.getUniform("Ks");
 	glUniform3fv(lightUniform, 1, glm::value_ptr(m_material.specular));
 
+	lightUniform = frag.getUniform("Kd");
+	glUniform3fv(lightUniform, 1, glm::value_ptr(m_material.diffuse));
+
 	lightUniform = frag.getUniform("Is");
 	glUniform3fv(lightUniform, 1, glm::value_ptr(m_directLight.specular));
 
@@ -153,12 +170,12 @@ bool LightingApp::Draw()
 	glUniform1f(lightUniform, m_material.specularPower);
 
 	lightUniform = frag.getUniform("camforward");
-	//glUniform3fv(lightUniform, 1, glm::value_ptr(glm::vec3(camera->getView()[3][0], camera->getView()[3][1], camera->getView()[3][2])));
+	//glUniform3fv(lightUniform, 1, glm::value_ptr(glm::vec3(camera->getView()[0][2], camera->getView()[1][2], camera->getView()[2][2])));
 	glUniform3fv(lightUniform, 1, glm::value_ptr(camera->m_position));
-	//glBindVertexArray(vao);
-	//glDrawElements(GL_TRIANGLES, indexcount, GL_UNSIGNED_INT, 0);
-	m_sphere.draw(GL_TRIANGLE_STRIP);
-	m_sphere.unbind();
+	glBindVertexArray(vao);
+	glDrawElements(GL_TRIANGLES, indexcount, GL_UNSIGNED_INT, 0);
+	//m_sphere.draw(GL_TRIANGLE_STRIP);
+	//m_sphere.unbind();
 	glUseProgram(0);
 
 	return true;

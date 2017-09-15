@@ -61,6 +61,13 @@ void Shader::defaultLoad()
 {
 }
 
+void Shader::reload(const char* filename, unsigned type)
+{
+	Source = FileRead(filename);
+	glShaderSource(m_Shader, 1, (const char **)&Source, 0);
+	glCompileShader(m_Shader);
+}
+
 unsigned Shader::getUniform(const char* name)
 {
 	return glGetUniformLocation(m_program, name);

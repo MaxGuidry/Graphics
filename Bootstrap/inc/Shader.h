@@ -10,6 +10,7 @@ public:
 	void load(const char * filename, unsigned int type);
 	void attach();
 	void defaultLoad();
+	void reload(const char * filename, unsigned int type);
 	//void load();
 	unsigned int getUniform(const char *);
 	unsigned int m_Shader;

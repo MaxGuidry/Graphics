@@ -26,5 +26,8 @@
     <ClInclude Include="inc\LightingApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="inc\tiny_obj_loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
