@@ -107,6 +107,8 @@ std::vector<glm::vec2> MaxGizmos::GenSphereUV(unsigned int circleize, unsigned i
 	}
 	return uvs;
 }
+
+
 Mesh MaxGizmos::GenSphere(float radius, unsigned int circleSize, unsigned int meridians)
 {
 
@@ -122,7 +124,7 @@ Mesh MaxGizmos::GenSphere(float radius, unsigned int circleSize, unsigned int me
 	{
 		Vertex vert = Vertex();
 		vert.position = v;
-		vert.color = glm::vec4(0);
+		vert.color = v;
 		vert.normal = glm::normalize(glm::vec4(v.x, v.y, v.z, 0));
 		vert.tangent = glm::vec4(glm::cross(glm::vec3(0, 1, 0), glm::vec3(vert.normal.x,vert.normal.y,vert.normal.z)),1);
 		vert.texcoord = uvs[uvindex];

@@ -33,5 +33,5 @@ void main()
 	//float DotRV = abs(min(dot(halfway, vec3(vNormal)),0.0f));
 	float DotRV = max(dot(halfway, vec3(vNormal)),0.0f);
 	float rvToa = pow(DotRV, a);
-	FragColor = vec4((Ka*Ia) + (Ks * Is * rvToa ),1);
+	FragColor = vec4((Ka*Ia) +(Id*Kd*lambertTerm)+ (Ks * Is * rvToa ),1);
 }

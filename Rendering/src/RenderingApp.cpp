@@ -213,7 +213,7 @@ bool RenderingApp::Start()
 	Vertex f = { glm::vec4(1,1,1,1),glm::vec4(1,1,1,1) };
 	Vertex g = { glm::vec4(0,0,1,1),glm::vec4(1,1,1,1) };
 	Vertex h = { glm::vec4(1,0,1,1),glm::vec4(1,1,1,1) };
-
+		
 	std::vector<Vertex> boxVerts{ a,b,c,d,e,f,g,h };
 	std::vector<unsigned int> boxindeces
 	{
@@ -285,14 +285,14 @@ bool RenderingApp::Start()
 	float radius = 1.f;
 	unsigned int circleSize = 10;
 	unsigned int meridians = 10;
-	std::vector<Vertex> sphereverts = std::vector<Vertex>();
 	
 	Mesh m = MaxGizmos::GenSphere(1.f, 10, 10);
 	SPHERE.initialize(m.getVerts(), m.getIndices());
 	SPHERE.create_buffers();
+
+
 	box.initialize(boxVerts, boxindeces);
 	box.create_buffers();
-	box.bind();
 	return true;
 }
 static double mousex = 0;
@@ -376,12 +376,7 @@ bool RenderingApp::Draw()
 	mesh->draw(GL_TRIANGLES);
 	mesh->unbind();
 	box.bind();
-	grid = grid * glm::mat4(
-		glm::cos(.01f), 0, -glm::sin(.01f), 0,
-		0, 1, 0, 0,
-		glm::sin(.01f), 0, glm::cos(.01f), 0,
-		0, 0, 0, 1);
-	glUniformMatrix4fv(projectionViewUniform, 1, false, glm::value_ptr(camera->getProjectionView()*  grid));
+	glUniformMatrix4fv(projectionViewUniform, 1, false, glm::value_ptr(camera->getProjectionView()));
 	box.draw(GL_TRIANGLES);
 	box.unbind();
 	circle.bind();
@@ -406,8 +401,8 @@ bool RenderingApp::Draw()
 	glUniformMatrix4fv(projectionViewUniform, 1, false, glm::value_ptr(camera->getProjectionView() * glm::translate(glm::vec3(0, -10, 0))  * scale5));
 	//glDrawArrays(GL_POINTS, 0, sphere->vertRef.size());
 	SPHERE.draw(GL_TRIANGLE_STRIP);
-
 	SPHERE.unbind();
+
 	glUseProgram(0);
 	return true;
 }

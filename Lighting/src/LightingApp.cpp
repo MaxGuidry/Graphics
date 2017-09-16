@@ -40,6 +40,7 @@ bool LightingApp::Start()
 	m_material.specular = glm::vec3(1);
 
 	m_material.specularPower = 30;
+
 	generateSphere(100, 100, vao, vbo, ibo, indexcount);
 	
 	m_PhongShader = glCreateProgram();
@@ -172,6 +173,7 @@ bool LightingApp::Draw()
 	lightUniform = frag.getUniform("camforward");
 	//glUniform3fv(lightUniform, 1, glm::value_ptr(glm::vec3(camera->getView()[0][2], camera->getView()[1][2], camera->getView()[2][2])));
 	glUniform3fv(lightUniform, 1, glm::value_ptr(camera->m_position));
+		
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, indexcount, GL_UNSIGNED_INT, 0);
 	//m_sphere.draw(GL_TRIANGLE_STRIP);
