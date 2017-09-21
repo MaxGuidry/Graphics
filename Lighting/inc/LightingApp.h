@@ -6,7 +6,7 @@
 class LightingApp :
 	public Application
 {
-public:
+public:	
 	LightingApp();
 	void generateSphere(unsigned int segments, unsigned int rings, unsigned int& vao, unsigned int& vbo, unsigned int& ibo, unsigned int& indexCount);
 	~LightingApp();
@@ -19,6 +19,7 @@ protected:
 	bool m_fill;
 	GLuint m_PhongShader;
 	Mesh m_sphere;
+	std::vector<Mesh> objects;
 	struct DirectionalLight
 	{
 		glm::vec3 direction;

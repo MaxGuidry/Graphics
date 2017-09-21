@@ -6,6 +6,10 @@
 #include "Shader.h"
 #include <MaxGizmos.h>
 #include <tiny_obj_loader.h>
+#include "imgui.h"
+#include "imgui_impl_glfw_gl3.h"
+#include "ReadFile.h"
+#include "imgui_internal.h"
 
 
 Shader frag;
@@ -14,7 +18,7 @@ unsigned int vao;
 unsigned int vbo;
 unsigned int ibo;
 unsigned int indexcount;
-LightingApp::LightingApp() : camera(new DollyCamera()), m_fill(false), m_PhongShader(0)
+LightingApp::LightingApp() : camera(new DollyCamera()), m_fill(false), m_PhongShader(0), objects(std::vector<Mesh>())
 {
 }
 
@@ -25,6 +29,10 @@ LightingApp::~LightingApp()
 
 bool LightingApp::Start()
 {
+	ImGui::CreateContext();
+	ImGui::GetIO().DisplaySize = ImVec2(20, 20);
+	ImGui_ImplGlfwGL3_Init(window, true);
+
 	camera->LookAt(camera->m_position, glm::vec3(0), glm::vec3(0, 1, 0));
 
 	//Mesh tmp = MaxGizmos::GenSphere(1.f, 32, 32);
@@ -41,7 +49,7 @@ bool LightingApp::Start()
 
 	m_material.specularPower = 30;
 
-	generateSphere(100, 100, vao, vbo, ibo, indexcount);
+	generateSphere(70, 70, vao, vbo, ibo, indexcount);
 
 	m_PhongShader = glCreateProgram();
 	vert = Shader(m_PhongShader);
@@ -60,49 +68,60 @@ static bool F1 = false;
 static bool F5 = false;
 static bool blinn = false;;
 
+
 bool LightingApp::Update(float deltaTime)
 {
+	/*if (ImGui::BeginMenu("Phong Frag"))
+	{
+		auto sd = ShaderData{ shader, fbuffer, GL_FRAGMENT_SHADER, false };
+		ImGui::InputTextMultiline("Shader", fbuffer, sizeof fbuffer, ImGui::GetWindowSize(),
+			ImGuiInputTextFlags_CallbackAlways, TextEditCallBackStub, static_cast<void*>(&sd));
+		ImGui::EndMenu();
+	}*/
+
 	static bool mouse_down = false;
-
-	if (mouse_down == false)
+	if (!ImGui::IsAnyItemActive())
 	{
-		mouse_down = true;
+		if (mouse_down == false)
+		{
+			mouse_down = true;
+			glfwGetCursorPos(window, &mousex, &mousey);
+		}
+
 		glfwGetCursorPos(window, &mousex, &mousey);
-	}
+		glm::vec2 cpos = glm::vec2(mousex, mousey);
 
-	glfwGetCursorPos(window, &mousex, &mousey);
-	glm::vec2 cpos = glm::vec2(mousex, mousey);
+		glm::vec2 deltaMouse = glm::vec2(mousex - pmouseX, mousey - pmouseY);
+		deltaMouse = deltaMouse * deltaTime;
 
-	glm::vec2 deltaMouse = glm::vec2(mousex - pmouseX, mousey - pmouseY);
-	deltaMouse = deltaMouse * deltaTime;
+		if (glfwGetMouseButton(window, 0))
+			camera->LookAround(deltaMouse);
 
-	if (glfwGetMouseButton(window, 0))
-		camera->LookAround(deltaMouse);
+		if (glfwGetKey(window, GLFW_KEY_D))
+		{
+			glm::vec3 right = glm::vec3(camera->m_view[0][0], camera->m_view[1][0], camera->m_view[2][0]);
+			camera->setPosition(right * .25f);
+		}
+		if (glfwGetKey(window, GLFW_KEY_W))
+		{
+			glm::vec3 forward = glm::vec3(camera->m_view[0][2], camera->m_view[1][2], camera->m_view[2][2]);
+			camera->setPosition(-forward* .25f);
+		}
+		if (glfwGetKey(window, GLFW_KEY_S))
+		{
+			glm::vec3 forward = glm::vec3(camera->m_view[0][2], camera->m_view[1][2], camera->m_view[2][2]);
+			camera->setPosition(forward* .25f);
+		}
+		if (glfwGetKey(window, GLFW_KEY_A))
+		{
+			glm::vec3 right = glm::vec3(camera->m_view[0][0], camera->m_view[1][0], camera->m_view[2][0]);
+			camera->setPosition(-right* .25f);
+		}
 
-	if (glfwGetKey(window, GLFW_KEY_D))
-	{
-		glm::vec3 right = glm::vec3(camera->m_view[0][0], camera->m_view[1][0], camera->m_view[2][0]);
-		camera->setPosition(right * .25f);
-	}
-	if (glfwGetKey(window, GLFW_KEY_W))
-	{
-		glm::vec3 forward = glm::vec3(camera->m_view[0][2], camera->m_view[1][2], camera->m_view[2][2]);
-		camera->setPosition(-forward* .25f);
-	}
-	if (glfwGetKey(window, GLFW_KEY_S))
-	{
-		glm::vec3 forward = glm::vec3(camera->m_view[0][2], camera->m_view[1][2], camera->m_view[2][2]);
-		camera->setPosition(forward* .25f);
-	}
-	if (glfwGetKey(window, GLFW_KEY_A))
-	{
-		glm::vec3 right = glm::vec3(camera->m_view[0][0], camera->m_view[1][0], camera->m_view[2][0]);
-		camera->setPosition(-right* .25f);
 	}
 	pmouseX = mousex;
 	pmouseY = mousey;
 	bool prevF1 = F1;
-
 	if (glfwGetKey(window, GLFW_KEY_F1))
 	{
 		F1 = true;
@@ -141,6 +160,7 @@ bool LightingApp::Update(float deltaTime)
 	else
 		frag.reload("./blinnphong.frag", GL_FRAGMENT_SHADER);
 	frag.attach();
+
 	return true;
 }
 
@@ -153,6 +173,7 @@ bool LightingApp::Shutdown()
 bool LightingApp::Draw()
 {
 
+	ImGui_ImplGlfwGL3_NewFrame();
 	glUseProgram(m_PhongShader);
 	//m_sphere.bind();
 	unsigned int pvU = vert.getUniform("ProjectionViewModel");
@@ -189,6 +210,54 @@ bool LightingApp::Draw()
 	glDrawElements(GL_TRIANGLES, indexcount, GL_UNSIGNED_INT, 0);
 	//m_sphere.draw(GL_TRIANGLE_STRIP);
 	//m_sphere.unbind();
+
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	ImGui::ShowTestWindow();
+	ImGui::Begin("test");
+	ImGui::SetWindowSize(ImVec2(700, 700));
+
+	ImGui::BeginGroup();
+	float ambient[3] = { m_ambientLight.r,m_ambientLight.g,m_ambientLight.b };
+	ImGui::ColorEdit3("Ambient Light", ambient);
+	m_ambientLight = glm::vec3(ambient[0], ambient[1], ambient[2]);
+	float diffuse[3] = { m_directLight.diffuse.r,m_directLight.diffuse.g,m_directLight.diffuse.b };
+	ImGui::ColorEdit3("Diffuse Light", diffuse);
+	m_directLight.diffuse = glm::vec3(diffuse[0], diffuse[1], diffuse[2]);
+	float spec[3] = { m_directLight.specular.r,m_directLight.specular.g,m_directLight.specular.b };
+	ImGui::ColorEdit3("Specular Light", spec);
+	m_directLight.specular = glm::vec3(spec[0], spec[1], spec[2]);
+	ImGui::EndGroup();
+	ImGui::End();
+#pragma region Object Menu
+	//ImGui::ItemSize(ImVec2(3, 20));
+	ImGui::Begin("Object Menu");
+	ImGui::SetWindowSize(ImVec2(100, 100));
+	if (ImGui::Button("Add Sphere", ImVec2(70, 15)))
+	{
+
+		Mesh m = MaxGizmos::GenSphere(1.f, 50, 50);
+		m.create_buffers();
+		m.m_position = glm::vec3(objects.size(), objects.size(), objects.size());
+		objects.push_back(m);
+	}
+	ImGui::End();
+	ImGui::Render();
+#pragma endregion 
+	for (auto m : objects)
+	{
+		
+		unsigned int pvm = vert.getUniform("ProjectionViewModel");
+		glUniformMatrix4fv(pvm, 1, false, glm::value_ptr(camera->getProjectionView() *glm::translate(m.m_position)));
+		
+
+		m.bind();
+		m.draw(GL_TRIANGLE_STRIP);
+		m.unbind();
+	}
+	if (!m_fill)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glUseProgram(0);
 
 	return true;

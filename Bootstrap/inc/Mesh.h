@@ -31,6 +31,7 @@ public:
 	unsigned int * vaoptr;
 	unsigned int * vboptr;
 	unsigned int * iboptr;
+	glm::vec3 m_position;
 	
 private:
 	unsigned int m_vao;
