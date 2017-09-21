@@ -237,14 +237,28 @@ bool LightingApp::Draw()
 	if (ImGui::Button("Add Sphere", ImVec2(70, 15)))
 	{
 
-		Mesh m = MaxGizmos::GenSphere(1.f, 50, 50);
+		Mesh m = MaxGizmos::GenSphere(1.f, 25, 25);
 		m.create_buffers();
 		m.m_position = glm::vec3(objects.size(), objects.size(), objects.size());
 		objects.push_back(m);
 	}
 	ImGui::End();
-	ImGui::Render();
+	
 #pragma endregion 
+	ImGui::Begin("test move");
+	ImGui::SetWindowSize(ImVec2(100, 100));
+	int i = 0;
+	for(auto m : objects)
+	{
+		if (ImGui::Button("sphere", ImVec2(20, 20)))
+			m_selectedObject = &objects[i];
+		i++;
+	}
+
+	ImGui::SliderFloat("X", &m_selectedObject->m_position.x, -9000, 9000);
+	ImGui::SliderFloat("Y", &m_selectedObject->m_position.y, -9000, 9000);
+	ImGui::SliderFloat("Z", &m_selectedObject->m_position.z, -9000, 9000);
+	ImGui::End();
 	for (auto m : objects)
 	{
 		
@@ -256,6 +270,8 @@ bool LightingApp::Draw()
 		m.draw(GL_TRIANGLE_STRIP);
 		m.unbind();
 	}
+	ImGui::Render();
+
 	if (!m_fill)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glUseProgram(0);

@@ -19,6 +19,7 @@ protected:
 	bool m_fill;
 	GLuint m_PhongShader;
 	Mesh m_sphere;
+	Mesh * m_selectedObject;
 	std::vector<Mesh> objects;
 	struct DirectionalLight
 	{
