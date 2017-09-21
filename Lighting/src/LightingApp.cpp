@@ -14,7 +14,7 @@ unsigned int vao;
 unsigned int vbo;
 unsigned int ibo;
 unsigned int indexcount;
-LightingApp::LightingApp() : camera(new DollyCamera()), m_fill(false)
+LightingApp::LightingApp() : camera(new DollyCamera()), m_fill(false), m_PhongShader(0)
 {
 }
 
@@ -26,14 +26,14 @@ LightingApp::~LightingApp()
 bool LightingApp::Start()
 {
 	camera->LookAt(camera->m_position, glm::vec3(0), glm::vec3(0, 1, 0));
-	
+
 	//Mesh tmp = MaxGizmos::GenSphere(1.f, 32, 32);
 	//m_sphere.initialize(tmp.getVerts(), tmp.getIndices());
 	//m_sphere.create_buffers();
 
-	m_directLight.diffuse = glm::vec3(0,1,0);
+	m_directLight.diffuse = glm::vec3(0, 1, 0);
 	m_directLight.specular = glm::vec3(1);
-	m_ambientLight = glm::vec3(0,.25f,0);
+	m_ambientLight = glm::vec3(0, .25f, 0);
 
 	m_material.diffuse = glm::vec3(1);
 	m_material.ambient = glm::vec3(1);
@@ -42,7 +42,7 @@ bool LightingApp::Start()
 	m_material.specularPower = 30;
 
 	generateSphere(100, 100, vao, vbo, ibo, indexcount);
-	
+
 	m_PhongShader = glCreateProgram();
 	vert = Shader(m_PhongShader);
 	vert.load("./phongv.vert", GL_VERTEX_SHADER);
@@ -57,6 +57,8 @@ static double mousey = 0;
 static double pmouseX = 0;
 static double pmouseY = 0;
 static bool F1 = false;
+static bool F5 = false;
+static bool blinn = false;;
 
 bool LightingApp::Update(float deltaTime)
 {
@@ -72,7 +74,7 @@ bool LightingApp::Update(float deltaTime)
 	glm::vec2 cpos = glm::vec2(mousex, mousey);
 
 	glm::vec2 deltaMouse = glm::vec2(mousex - pmouseX, mousey - pmouseY);
-	deltaMouse = deltaMouse * deltaTime * 1.f;
+	deltaMouse = deltaMouse * deltaTime;
 
 	if (glfwGetMouseButton(window, 0))
 		camera->LookAround(deltaMouse);
@@ -115,21 +117,30 @@ bool LightingApp::Update(float deltaTime)
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	float time = glfwGetTime();
-	m_directLight.direction = glm::normalize(glm::vec3(-1,-1,-1));
+	m_directLight.direction = glm::normalize(glm::vec3(-1, -1, -1));
 	if (glfwGetKey(window, GLFW_KEY_UP))
-		m_material.specularPower+=.2f;
+		m_material.specularPower += .2f;
 	if (glfwGetKey(window, GLFW_KEY_DOWN))
-		m_material.specularPower-=.2f;
+		m_material.specularPower -= .2f;
 	//std::cout << m_material.specularPower << std::endl;
 	m_directLight.direction = glm::normalize(glm::vec3(10, 10, 10));
 	//m_directLight.diffuse = glm::vec3(sin(time), sin(2.f*time), cos(time));
 	//m_directLight.direction = glm::normalize(glm::vec3(sin(time/2.f), 0, cos(time/2.f)));
-	if(glfwGetKey(window,GLFW_KEY_F5))
-	{
 
+	bool F5_held = F5;
+
+	if (glfwGetKey(window, GLFW_KEY_F5))
+		F5 = true;
+	else
+		F5 = false;
+
+	if (F5 && F5_held != F5)
+		blinn = !blinn;
+	if (!blinn)
 		frag.reload("./phongf.frag", GL_FRAGMENT_SHADER);
-		frag.attach();
-	}
+	else
+		frag.reload("./blinnphong.frag", GL_FRAGMENT_SHADER);
+	frag.attach();
 	return true;
 }
 
@@ -173,7 +184,7 @@ bool LightingApp::Draw()
 	lightUniform = frag.getUniform("camforward");
 	//glUniform3fv(lightUniform, 1, glm::value_ptr(glm::vec3(camera->getView()[0][2], camera->getView()[1][2], camera->getView()[2][2])));
 	glUniform3fv(lightUniform, 1, glm::value_ptr(camera->m_position));
-		
+
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, indexcount, GL_UNSIGNED_INT, 0);
 	//m_sphere.draw(GL_TRIANGLE_STRIP);

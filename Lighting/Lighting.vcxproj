@@ -124,6 +124,9 @@
     <ClInclude Include="inc\LightingApp.h" />
     <ClInclude Include="inc\tiny_obj_loader.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\blinnphong.frag" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
