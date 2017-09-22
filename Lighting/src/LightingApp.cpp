@@ -179,7 +179,7 @@ bool LightingApp::Draw()
 	unsigned int pvU = vert.getUniform("ProjectionViewModel");
 	glUniformMatrix4fv(pvU, 1, false, glm::value_ptr(camera->getProjectionView() * glm::scale(glm::vec3(5))));
 	int lightUniform = frag.getUniform("direction");
-	glUniform3fv(lightUniform, 1, glm::value_ptr(m_directLight.direction));
+	glUniform3fv(lightUniform, 1, glm::value_ptr(-m_directLight.direction));
 
 	lightUniform = frag.getUniform("Id");
 	glUniform3fv(lightUniform, 1, glm::value_ptr(m_directLight.diffuse));
@@ -243,37 +243,51 @@ bool LightingApp::Draw()
 		objects.push_back(m);
 	}
 	ImGui::End();
-	
+
 #pragma endregion 
 	ImGui::Begin("test move");
-	ImGui::SetWindowSize(ImVec2(100, 100));
+	ImGui::SetWindowSize(ImVec2(500, 500));
 	int i = 0;
-	for(auto m : objects)
+	for (auto m : objects)
 	{
-		if (ImGui::Button("sphere", ImVec2(20, 20)))
+		std::string s = std::to_string(i);
+		s = "sphere " + s;
+		char const *pchar = s.c_str();
+		if (ImGui::Button(pchar, ImVec2(70, 20)))
 			m_selectedObject = &objects[i];
 		i++;
 	}
-
-	ImGui::SliderFloat("X", &m_selectedObject->m_position.x, -9000, 9000);
-	ImGui::SliderFloat("Y", &m_selectedObject->m_position.y, -9000, 9000);
-	ImGui::SliderFloat("Z", &m_selectedObject->m_position.z, -9000, 9000);
+	if (m_selectedObject != nullptr)
+	{
+		if (ImGui::DragFloat("X", &(m_selectedObject->m_position.x), .05f, -9000, 9000))
+			if (ImGui::GetMousePos().x > 890)
+			{
+				
+				
+				
+				
+			}
+		ImGui::DragFloat("Y", &(m_selectedObject->m_position.y), .05f, -9000, 9000);
+		ImGui::DragFloat("Z", &(m_selectedObject->m_position.z), .05f, -9000, 9000);
+	}
 	ImGui::End();
+	ImGui::Render();
+
+	if (!m_fill)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	for (auto m : objects)
 	{
-		
+
 		unsigned int pvm = vert.getUniform("ProjectionViewModel");
 		glUniformMatrix4fv(pvm, 1, false, glm::value_ptr(camera->getProjectionView() *glm::translate(m.m_position)));
-		
+
 
 		m.bind();
 		m.draw(GL_TRIANGLE_STRIP);
 		m.unbind();
 	}
-	ImGui::Render();
 
-	if (!m_fill)
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 	glUseProgram(0);
 
 	return true;
