@@ -69,7 +69,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)inc;$(SolutionDir)Bootstrap\inc;$(SolutionDir)dep;</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)inc;$(SolutionDir)Bootstrap\inc;$(SolutionDir)dep;$(SolutionDir)dep\stb</IncludePath>
     <SourcePath>$(VC_SourcePath);$(ProjectDir)src;$(SolutionDir)Bootstrap\src</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

@@ -2,7 +2,8 @@
 #include "Application.h"
 #include "DollyCamera.h"
 #include <Mesh.h>
-
+#define STB_IMAGE_IMPLEMENTATION
+#include<stb/stb_image.h>
 class LightingApp :
 	public Application
 {
