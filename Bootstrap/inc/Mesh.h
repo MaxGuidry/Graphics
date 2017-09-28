@@ -39,7 +39,7 @@ public:
 	unsigned int * iboptr;
 	glm::vec3 m_position;
 	Texture texture;
-	
+	void loadTexture(const char * filename, unsigned int format);
 private:
 	unsigned int m_vao;
 	unsigned int m_vbo;

@@ -15,6 +15,7 @@ protected:
 	bool Draw() override;
 	Mesh * GenGrid(unsigned int rows, unsigned int cols);
 	Mesh * GridMesh;
+	char * textureName;
 	DollyCamera cam;
 };
 

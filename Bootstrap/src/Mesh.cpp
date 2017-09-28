@@ -1,6 +1,6 @@
 #include "Mesh.h"
 #include <gl_core_4_4.h>
-#include "gl_core_4_4.h"
+#include <stb_image.h>
 
 
 Mesh::Mesh() : index_Count(0), vertex_Count(0), m_vao(0), m_vbo(0), m_ibo(0), m_tbo(0), vertRef(m_vertices), indicesRef(m_indices), vboptr(&m_vbo), vaoptr(&m_vbo), iboptr(&m_ibo)
@@ -14,11 +14,7 @@ Mesh::~Mesh()
 
 void Mesh::create_buffers()
 {
-	glGenTextures(1, &m_tbo);
-	glBindTexture(GL_TEXTURE_2D, m_tbo);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture.width, texture.height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture.data);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	
 
 	glGenVertexArrays(1, &m_vao);
 	glGenBuffers(1, &m_vbo);
@@ -63,6 +59,7 @@ void Mesh::initialize(std::vector<Vertex>& verts, std::vector<unsigned int>& ind
 	for (auto i : indeces)
 		m_indices.push_back(i);
 	index_Count = m_indices.size();
+	glGenTextures(1, &m_tbo);
 }
 
 void Mesh::bind()
@@ -70,8 +67,6 @@ void Mesh::bind()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_tbo);
 	glBindVertexArray(m_vao);
-	
-	
 
 }
 
@@ -117,4 +112,15 @@ std::vector<Vertex> Mesh::getVerts()
 std::vector<unsigned> Mesh::getIndices()
 {
 	return this->m_indices;
+}
+
+void Mesh::loadTexture(const char* filename, unsigned format)
+{
+	this->texture.data = stbi_load(filename, &this->texture.width, &this->texture.height, &this->texture.format, STBI_rgb_alpha);
+	
+	glBindTexture(GL_TEXTURE_2D, m_tbo);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.width, texture.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.data);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	stbi_image_free(texture.data);
 }
