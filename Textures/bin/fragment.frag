@@ -14,6 +14,7 @@ uniform vec3 Ka;
 uniform vec3 Kd;
 uniform vec3 Ks;
 uniform float a;
+uniform float time;
 
 out vec4 FragColor;
 uniform sampler2D tex;
@@ -27,8 +28,9 @@ void main() {
 	float DotRV = max(dot(halfway, vec3(vNormal)),0.0f);
 	float rvToa = pow(DotRV, a);
 	 
-	
-	FragColor = texture(tex, vUV);
+	vec2 duv = vUV;
+	duv.y+=time * .02f;
+	FragColor = texture(tex, duv);
 	//vec4((Ka*Ia) +(Id*Kd*lambertTerm)+ (Ks * Is * rvToa ),1)
 	 
 }

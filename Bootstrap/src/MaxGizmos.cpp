@@ -143,6 +143,6 @@ Mesh MaxGizmos::GenSphere(float radius, unsigned int circleSize, unsigned int me
 		uvindex++;
 		sphereverts.push_back(vert);
 	}
-	s.initialize(sphereverts, indices);
+	s.initialize(sphereverts, indices, GL_TRIANGLE_STRIP);
 	return s;
 }

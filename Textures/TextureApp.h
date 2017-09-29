@@ -13,10 +13,9 @@ protected:
 	bool Update(float deltaTime) override;
 	bool Shutdown() override;
 	bool Draw() override;
-	Mesh * GenGrid(unsigned int rows, unsigned int cols);
-	Mesh * GridMesh;
-	Mesh * SphereMesh;
-	char * textureName;
+	Mesh GenGrid(unsigned int rows, unsigned int cols);
+	Mesh GridMesh;
+	Mesh * selectedMesh;
 	DollyCamera cam;
 	std::vector<Mesh> objects;
 	struct DirectionalLight

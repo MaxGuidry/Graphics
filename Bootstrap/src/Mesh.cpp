@@ -51,8 +51,9 @@ void Mesh::create_buffers()
 
 }
 
-void Mesh::initialize(std::vector<Vertex>& verts, std::vector<unsigned int>& indeces)
+void Mesh::initialize(std::vector<Vertex>& verts, std::vector<unsigned int>& indeces, unsigned int drawmode)
 {
+	drawMode = drawmode;
 	for (auto v : verts)
 		m_vertices.push_back(v);
 	vertex_Count = m_vertices.size();
@@ -75,9 +76,9 @@ void Mesh::unbind()
 	glBindVertexArray(0);
 }
 
-bool Mesh::draw(GLint drawmode)
+bool Mesh::draw()
 {
-	switch (drawmode)
+	switch (drawMode)
 	{
 	case GL_LINES:
 

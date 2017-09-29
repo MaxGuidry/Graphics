@@ -283,7 +283,7 @@ bool LightingApp::Draw()
 
 
 		m.bind();
-		m.draw(GL_TRIANGLE_STRIP);
+		m.draw();
 		m.unbind();
 	}
 

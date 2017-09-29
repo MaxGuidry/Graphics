@@ -17,6 +17,7 @@ struct Texture
 {
 	int width, height, format;
 	unsigned char * data;
+	char * textureFile = new char;
 };
 class Mesh
 {
@@ -24,10 +25,10 @@ public:
 	Mesh();
 	~Mesh();
 	void create_buffers();
-	void initialize(std::vector<Vertex>& verts, std::vector<unsigned int>& indeces);
+	void initialize(std::vector<Vertex>& verts, std::vector<unsigned int>& indeces, unsigned int drawmode);
 	void bind();
 	void unbind();
-	bool draw(GLint drawmode);
+	bool draw();
 	unsigned int index_Count;
 	unsigned int vertex_Count;
 	const std::vector<Vertex>& vertRef;
@@ -37,6 +38,7 @@ public:
 	unsigned int * vaoptr;
 	unsigned int * vboptr;
 	unsigned int * iboptr;
+	unsigned int drawMode;
 	glm::vec3 m_position;
 	Texture texture;
 	void loadTexture(const char * filename, unsigned int format);
