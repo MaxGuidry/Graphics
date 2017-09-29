@@ -22,7 +22,7 @@ unsigned int indexcount;
 Shader vert;
 Shader frag;
 GLuint shader;
-TextureApp::TextureApp() : GridMesh(), cam(), textureName(new char)
+TextureApp::TextureApp() : GridMesh(), cam()
 {
 }
 
@@ -49,7 +49,7 @@ bool TextureApp::Start()
 	m_material.specularPower = 30;
 	m_directLight.direction = glm::vec3(1, 1, 1);
 	cam.LookAt(cam.m_position, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-	GridMesh = GenGrid(3, 3);
+	Mesh grid = GenGrid(3, 3);
 	shader = glCreateProgram();
 	vert = Shader(shader);
 	vert.load("vertex.vert", GL_VERTEX_SHADER);
@@ -62,12 +62,14 @@ bool TextureApp::Start()
 	Mesh m = MaxGizmos::GenSphere(1, 50, 50);
 	m.create_buffers();
 	//m.m_position = glm::vec3(objects.size(), objects.size(), objects.size());
-	m.loadTexture("./space.png", STBI_rgb_alpha);
+	//m.loadTexture("./space.png", STBI_rgb_alpha);
 	m.create_buffers();
 	objects.push_back(m);
-
-
-	GridMesh->create_buffers();
+	//objects.push_back(*GridMesh);
+	m.loadTexture("./skyrim.png", STBI_default);
+	grid.loadTexture("./bball.png", STBI_default);
+	grid.create_buffers();
+	objects.push_back(grid);
 
 	return true;
 }
@@ -77,41 +79,58 @@ static double pmouseX = 0;
 static double pmouseY = 0;
 static bool F1 = false;
 static bool F5 = false;
+float timeHeld = 1;
 bool TextureApp::Update(float deltaTime)
 {
+
+	
+	
+
+	
 	if (glfwGetKey(window, GLFW_KEY_F12))
-		objects[0].loadTexture(textureName, STBI_default);
+		selectedMesh->loadTexture(selectedMesh->texture.textureFile, STBI_default);
 	glfwGetCursorPos(window, &mousex, &mousey);
 	glm::vec2 cpos = glm::vec2(mousex, mousey);
+	glm::vec3 oldCam = cam.m_position;
 
 	glm::vec2 deltaMouse = glm::vec2(mousex - pmouseX, mousey - pmouseY);
 	deltaMouse = deltaMouse * deltaTime;
-
-	if (glfwGetMouseButton(window, 0))
-		cam.LookAround(deltaMouse);
-
-	if (glfwGetKey(window, GLFW_KEY_D))
+	if (!ImGui::IsAnyItemActive())
 	{
-		glm::vec3 right = glm::vec3(cam.m_view[0][0], cam.m_view[1][0], cam.m_view[2][0]);
-		cam.setPosition(right * .05f);
-	}
-	if (glfwGetKey(window, GLFW_KEY_W))
-	{
-		glm::vec3 forward = glm::vec3(cam.m_view[0][2], cam.m_view[1][2], cam.m_view[2][2]);
-		cam.setPosition(-forward* .05f);
-	}
-	if (glfwGetKey(window, GLFW_KEY_S))
-	{
-		glm::vec3 forward = glm::vec3(cam.m_view[0][2], cam.m_view[1][2], cam.m_view[2][2]);
-		cam.setPosition(forward* .05f);
-	}
-	if (glfwGetKey(window, GLFW_KEY_A))
-	{
-		glm::vec3 right = glm::vec3(cam.m_view[0][0], cam.m_view[1][0], cam.m_view[2][0]);
-		cam.setPosition(-right* .05f);
-	}
+		if (glfwGetMouseButton(window, 0))
+			cam.LookAround(deltaMouse);
+		if (glfwGetKey(window, GLFW_KEY_D))
+		{
+			glm::vec3 right = glm::vec3(cam.m_view[0][0], cam.m_view[1][0], cam.m_view[2][0]);
+			cam.setPosition(right * deltaTime * timeHeld);
+			timeHeld += deltaTime;
+		}
 
+		if (glfwGetKey(window, GLFW_KEY_W))
+		{
+			glm::vec3 forward = glm::vec3(cam.m_view[0][2], cam.m_view[1][2], cam.m_view[2][2]);
+			cam.setPosition(-forward* deltaTime* timeHeld);
+			timeHeld += deltaTime;
+		}
 
+		if (glfwGetKey(window, GLFW_KEY_S))
+		{
+			glm::vec3 forward = glm::vec3(cam.m_view[0][2], cam.m_view[1][2], cam.m_view[2][2]);
+			cam.setPosition(forward* deltaTime* timeHeld);
+			timeHeld += deltaTime;
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_A))
+		{
+			glm::vec3 right = glm::vec3(cam.m_view[0][0], cam.m_view[1][0], cam.m_view[2][0]);
+			cam.setPosition(-right* deltaTime*timeHeld);
+			timeHeld += deltaTime;
+		}
+	}
+	if (glm::length(cam.m_position - oldCam) < .01)
+		timeHeld = 1;
+
+	
 	pmouseX = mousex;
 	pmouseY = mousey;
 	return true;
@@ -129,13 +148,47 @@ bool TextureApp::Draw()
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	unsigned int pvm = vert.getUniform("ProjectionViewModel");
+	unsigned int time = glGetUniformLocation(shader, "time");
+	glUniform1f(time, glfwGetTime());
 	glUniformMatrix4fv(pvm, 1, false, glm::value_ptr(cam.getProjectionView()));
 	unsigned int texID = frag.getUniform("tex");
 	glUniform1i(texID, 0);
 	ImGui::Begin("test");
 	ImGui::SetWindowSize(ImVec2(200, 200));
-	ImGui::InputText("Texture File", textureName, 50);
+	if (selectedMesh != nullptr)
+		ImGui::InputText("Texture File", selectedMesh->texture.textureFile, 50);
+	ImGui::End();
 
+	ImGui::Begin("test move");
+	ImGui::SetWindowSize(ImVec2(500, 500));
+	int i = 0;
+	for (auto m : objects)
+	{
+		std::string s = std::to_string(i);
+		s = "geometry " + s;
+		char const *pchar = s.c_str();
+		if (ImGui::Button(pchar, ImVec2(70, 20)))
+			selectedMesh = &objects[i];
+		i++;
+	}
+	if (selectedMesh != nullptr)
+	{
+		ImGui::DragFloat("X", &(selectedMesh->m_position.x), .05f, -9000, 9000);
+		ImGui::DragFloat("Y", &(selectedMesh->m_position.y), .05f, -9000, 9000);
+		ImGui::DragFloat("Z", &(selectedMesh->m_position.z), .05f, -9000, 9000);
+	}
+	ImGui::End();
+	ImGui::Begin("Object Menu");
+	ImGui::SetWindowSize(ImVec2(100, 100));
+	if (ImGui::Button("Add Sphere", ImVec2(70, 15)))
+	{
+
+		Mesh m = MaxGizmos::GenSphere(1.f, 25, 25);
+		m.create_buffers();
+		m.m_position = glm::vec3(objects.size(), objects.size(), objects.size());
+		objects.push_back(m);
+	}
+	ImGui::End();
 	glUniformMatrix4fv(pvm, 1, false, glm::value_ptr(cam.getProjectionView() * glm::scale(glm::vec3(5))));
 	int lightUniform = frag.getUniform("direction");
 	glUniform3fv(lightUniform, 1, glm::value_ptr(m_directLight.direction));
@@ -164,29 +217,27 @@ bool TextureApp::Draw()
 	lightUniform = frag.getUniform("camforward");
 	glUniform3fv(lightUniform, 1, glm::value_ptr(cam.m_position));
 
-	/*GridMesh->bind();
-	GridMesh->draw(GL_TRIANGLES);
-	GridMesh->unbind();*/
-	/*glBindVertexArray(vao);
-	glDrawElements(GL_TRIANGLES, indexcount, GL_UNSIGNED_INT, 0);*/
+
+	int rnad = vert.getUniform("rand");
+	float rnd = rand() % 60 + 30;
+	glUniform1f(rnad, rnd);
 	for (auto m : objects)
 	{
 
 		unsigned int pvm = vert.getUniform("ProjectionViewModel");
 		glUniformMatrix4fv(pvm, 1, false, glm::value_ptr(cam.getProjectionView() * glm::scale(glm::vec3(5)) *glm::translate(m.m_position)));
 
-
 		m.bind();
-		m.draw(GL_TRIANGLE_STRIP);
+		m.draw();
 		m.unbind();
 	}
 
 	glUseProgram(0);
-	ImGui::End();
+
 	ImGui::Render();
 	return true;
 }
-Mesh * TextureApp::GenGrid(unsigned int rows, unsigned int cols)
+Mesh TextureApp::GenGrid(unsigned int rows, unsigned int cols)
 {
 	Vertex * aoVerts = new Vertex[rows * cols];
 	for (unsigned int r = 0; r < rows; ++r)
@@ -219,8 +270,8 @@ Mesh * TextureApp::GenGrid(unsigned int rows, unsigned int cols)
 		verts.push_back(aoVerts[i]);
 	for (unsigned int i = 0; i < index; i++)
 		indices.push_back(auiIndices[i]);
-	Mesh * gridMesh = new Mesh();
-	gridMesh->initialize(verts, indices);
+	Mesh gridMesh = Mesh();
+	gridMesh.initialize(verts, indices, GL_TRIANGLES);
 	verts.clear();
 	indices.clear();
 	delete[] auiIndices;
