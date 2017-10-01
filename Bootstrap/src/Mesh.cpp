@@ -117,7 +117,7 @@ std::vector<unsigned> Mesh::getIndices()
 
 void Mesh::loadTexture(const char* filename, unsigned format)
 {
-	this->texture.data = stbi_load(filename, &this->texture.width, &this->texture.height, &this->texture.format, STBI_rgb_alpha);
+	this->texture.data = stbi_load(filename, &this->texture.width, &this->texture.height, &this->texture.format, format);
 	
 	glBindTexture(GL_TEXTURE_2D, m_tbo);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.width, texture.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.data);

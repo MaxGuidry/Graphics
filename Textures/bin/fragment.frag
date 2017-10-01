@@ -31,6 +31,7 @@ void main() {
 	vec2 duv = vUV;
 	duv.y+=time * .02f;
 	FragColor = texture(tex, duv);
+
 	//vec4((Ka*Ia) +(Id*Kd*lambertTerm)+ (Ks * Is * rvToa ),1)
 	 
 }

@@ -1,4 +1,4 @@
-#include "TextureApp.h"
+	#include "TextureApp.h"
 #include "gl_core_4_4.h"
 #include<glfw/include/GLFW/glfw3.h>
 #include "Shader.h"
@@ -66,8 +66,8 @@ bool TextureApp::Start()
 	m.create_buffers();
 	objects.push_back(m);
 	//objects.push_back(*GridMesh);
-	m.loadTexture("./skyrim.png", STBI_default);
-	grid.loadTexture("./bball.png", STBI_default);
+	m.loadTexture("./crate.png", STBI_rgb_alpha);
+	grid.loadTexture("./crate.png", STBI_rgb_alpha);
 	grid.create_buffers();
 	objects.push_back(grid);
 
