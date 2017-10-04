@@ -15,24 +15,50 @@
 float maxNoise(glm::vec2 verts, unsigned int dims, int seed)
 {
 	int prime = 36343;
-	float num = prime / float(seed);
+	char * c = new char[1];
 
+
+	for (int i = 0; i < seed; i++)
+	{
+		c++;
+	}
+	while (*c == 0)
+		c++;
+	float num = prime / float(seed) * *c;
+
+	float numa = sqrt(glm::abs(*c));
+	if (numa == 0)
+		numa++;
+	float numb = float(prime) / sqrt(glm::abs(*c + prime));
+	if (numb == 0)
+		numb++;
 	float noise = 0.f;
 	float x = verts.x / float(dims);
 	float y = verts.y / float(dims);
-	x = x * num + float(prime) / 2.f;
-	y = y * num + float(prime) / 2.f;
+	x = glm::ceil(x * num + float(prime) / numa);
+	y = glm::ceil(y * prime * float(num) / numb);
 	float x2 = (verts.x - 1) / float(dims);
 	float y2 = (verts.y - 1) / float(dims);
-	x2 = x2 * num + float(prime) / 2.f;
-	y2 = y2 * num + float(prime) / 2.f;
-	
-	noise = glm::normalize(glm::lerp(glm::vec2(x, y), glm::vec2(x2, y2), 1.f)).r;
-	while (int(noise) != prime)
-		noise = maxNoise(glm::vec2(x, y), dims, noise);
+	x2 = glm::ceil(x2 * num + float(prime) / numa);
+	y2 = glm::ceil(y2 * prime * float(num) / numb);
+	float x3 = (verts.x + 1) / float(dims);
+	float y3 = (verts.y + 1) / float(dims);
+	x3 = glm::ceil(x3 * num + float(prime) / numa);
+	y3 = glm::ceil(y3 * prime * float(num) / numb);
+	glm::vec4 lerped = glm::vec4(glm::lerp(glm::vec2(x, y), glm::vec2(x2, y), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x, y2), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x2, y2), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x, y3), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x3, y), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x3, y3), .1f), 1, 1);
+	lerped = lerped * glm::rotate(float(sqrt(abs(*c))), glm::vec3(seed, *c, prime));
 
-	
-	return noise ;
+	noise = glm::normalize(lerped).r;
+	if (dims == seed && noise <1 && noise>-1)
+		return noise* glm::sign(*c);
+	if (noise <1 && noise>-1)
+		return noise * maxNoise(verts, *c, *c)* glm::sign(*c);
+	else
+		noise = maxNoise(verts, dims, *(c++));
+
+	return noise * glm::sign(*c);
+
+
 }
 
 void generateSphere(unsigned int segments, unsigned int rings,
@@ -93,7 +119,7 @@ bool TextureApp::Start()
 	//grid.loadTexture("./crate.png", STBI_rgb_alpha);
 
 	int dims = 64;
-	int seed = 1.f;
+	int seed = 7.f;
 	float *perlinData = new float[dims * dims];
 	float scale = (1.0f / dims) * 3;
 	int octaves = 6;
@@ -108,11 +134,17 @@ bool TextureApp::Start()
 			{
 				float freq = powf(2, (float)o);
 				//float perlinSample = glm::perlin(glm::vec2((float)x, (float)y) * scale * freq) * 0.5f + 0.5f;
-				
+
 				float perlinSample = maxNoise(glm::vec2(float(x), float(y) * scale*freq), dims, seed) *.5f + .5f;
-				std::cout << perlinSample << std::endl;
+				
+				
+				//std::cout << perlinSample << std::endl;
 				perlinData[y * dims + x] += perlinSample * amplitude; amplitude *= persistence;
 			}
+			int f = (y * dims + x);
+			if (f > dims && f < (dims * dims) - 1)
+				perlinData[f + 1] = (perlinData[f+1] + perlinData[f] + perlinData[f-dims]) / 4.f;
+			std::cout << perlinData[f + 1] << std::endl;
 		}
 	}
 	m.loadNoise(dims, dims, perlinData);

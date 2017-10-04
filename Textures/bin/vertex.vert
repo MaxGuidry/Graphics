@@ -25,7 +25,7 @@ void main()
 	//vpos.x += texture(tex,UV);
 	//vpos.y += texture(tex,UV);
 	//vpos.z += texture(tex,UV);
-	vpos.y += texture(tex,UV).r *20;	
+	vpos.y += texture(tex,UV).r *2;	
 	vColor = Color;
 	vNormal = Normal;
 	vUV = UV;
