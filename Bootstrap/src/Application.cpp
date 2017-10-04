@@ -32,7 +32,7 @@ Application::Application(): window(nullptr), m_running(true)
 	 double deltaTime = 0;
 	 double currentTime = glfwGetTime();
 	 double prevTime = 0;
-	 //glfwSwapInterval(0);
+	 glfwSwapInterval(0);
 	 glClearColor(.2f, .3f, .5f, 1);
 	 Start();
 	 while (this->m_running)

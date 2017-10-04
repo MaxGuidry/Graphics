@@ -14,20 +14,20 @@ Mesh::~Mesh()
 
 void Mesh::create_buffers()
 {
-	
+
 
 	glGenVertexArrays(1, &m_vao);
 	glGenBuffers(1, &m_vbo);
 	glGenBuffers(1, &m_ibo);
-	
-	
+
+
 	glBindVertexArray(m_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
 	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(m_vertices.front()), m_vertices.data(), GL_STATIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(m_indices.front()), m_indices.data(), GL_STATIC_DRAW);
-	
-	
+
+
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
@@ -118,10 +118,20 @@ std::vector<unsigned> Mesh::getIndices()
 void Mesh::loadTexture(const char* filename, unsigned format)
 {
 	this->texture.data = stbi_load(filename, &this->texture.width, &this->texture.height, &this->texture.format, format);
-	
+
 	glBindTexture(GL_TEXTURE_2D, m_tbo);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.width, texture.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.data);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	stbi_image_free(texture.data);
+}
+
+void Mesh::loadNoise(unsigned height, unsigned width, float* data)
+{
+	glBindTexture(GL_TEXTURE_2D, m_tbo);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, height, width, 0, GL_RED, GL_FLOAT, data);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 }

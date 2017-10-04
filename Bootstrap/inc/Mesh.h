@@ -42,6 +42,7 @@ public:
 	glm::vec3 m_position;
 	Texture texture;
 	void loadTexture(const char * filename, unsigned int format);
+	void loadNoise(unsigned int height, unsigned int width, float * data);
 private:
 	unsigned int m_vao;
 	unsigned int m_vbo;

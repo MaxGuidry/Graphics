@@ -1,4 +1,4 @@
-	#include "TextureApp.h"
+#include "TextureApp.h"
 #include "gl_core_4_4.h"
 #include<glfw/include/GLFW/glfw3.h>
 #include "Shader.h"
@@ -11,6 +11,29 @@
 #include "imgui.h"
 #include "imgui_impl_glfw_gl3.h"
 #include "MaxGizmos.h"
+
+float maxNoise(glm::vec2 verts, unsigned int dims, int seed)
+{
+	int prime = 36343;
+	float num = prime / float(seed);
+
+	float noise = 0.f;
+	float x = verts.x / float(dims);
+	float y = verts.y / float(dims);
+	x = x * num + float(prime) / 2.f;
+	y = y * num + float(prime) / 2.f;
+	float x2 = (verts.x - 1) / float(dims);
+	float y2 = (verts.y - 1) / float(dims);
+	x2 = x2 * num + float(prime) / 2.f;
+	y2 = y2 * num + float(prime) / 2.f;
+	
+	noise = glm::normalize(glm::lerp(glm::vec2(x, y), glm::vec2(x2, y2), 1.f)).r;
+	while (int(noise) != prime)
+		noise = maxNoise(glm::vec2(x, y), dims, noise);
+
+	
+	return noise ;
+}
 
 void generateSphere(unsigned int segments, unsigned int rings,
 	unsigned int& vao, unsigned int& vbo, unsigned int& ibo,
@@ -49,7 +72,7 @@ bool TextureApp::Start()
 	m_material.specularPower = 30;
 	m_directLight.direction = glm::vec3(1, 1, 1);
 	cam.LookAt(cam.m_position, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-	Mesh grid = GenGrid(3, 3);
+	Mesh grid = GenGrid(64, 64);
 	shader = glCreateProgram();
 	vert = Shader(shader);
 	vert.load("vertex.vert", GL_VERTEX_SHADER);
@@ -66,8 +89,34 @@ bool TextureApp::Start()
 	m.create_buffers();
 	objects.push_back(m);
 	//objects.push_back(*GridMesh);
-	m.loadTexture("./crate.png", STBI_rgb_alpha);
-	grid.loadTexture("./crate.png", STBI_rgb_alpha);
+	//m.loadTexture("./crate.png", STBI_rgb_alpha);
+	//grid.loadTexture("./crate.png", STBI_rgb_alpha);
+
+	int dims = 64;
+	int seed = 1.f;
+	float *perlinData = new float[dims * dims];
+	float scale = (1.0f / dims) * 3;
+	int octaves = 6;
+	for (int x = 0; x < dims; ++x)
+	{
+		for (int y = 0; y < dims; ++y)
+		{
+			float amplitude = 1.f;
+			float persistence = 0.3f;
+			perlinData[y * dims + x] = 0;
+			for (int o = 0; o < octaves; ++o)
+			{
+				float freq = powf(2, (float)o);
+				//float perlinSample = glm::perlin(glm::vec2((float)x, (float)y) * scale * freq) * 0.5f + 0.5f;
+				
+				float perlinSample = maxNoise(glm::vec2(float(x), float(y) * scale*freq), dims, seed) *.5f + .5f;
+				std::cout << perlinSample << std::endl;
+				perlinData[y * dims + x] += perlinSample * amplitude; amplitude *= persistence;
+			}
+		}
+	}
+	m.loadNoise(dims, dims, perlinData);
+	grid.loadNoise(dims, dims, perlinData);
 	grid.create_buffers();
 	objects.push_back(grid);
 
@@ -83,10 +132,9 @@ float timeHeld = 1;
 bool TextureApp::Update(float deltaTime)
 {
 
-	
-	
 
-	
+
+
 	if (glfwGetKey(window, GLFW_KEY_F12))
 		selectedMesh->loadTexture(selectedMesh->texture.textureFile, STBI_default);
 	glfwGetCursorPos(window, &mousex, &mousey);
@@ -130,7 +178,7 @@ bool TextureApp::Update(float deltaTime)
 	if (glm::length(cam.m_position - oldCam) < .01)
 		timeHeld = 1;
 
-	
+
 	pmouseX = mousex;
 	pmouseY = mousey;
 	return true;
@@ -153,6 +201,9 @@ bool TextureApp::Draw()
 	glUniformMatrix4fv(pvm, 1, false, glm::value_ptr(cam.getProjectionView()));
 	unsigned int texID = frag.getUniform("tex");
 	glUniform1i(texID, 0);
+	unsigned int texV = vert.getUniform("tex");
+	glUniform1i(texV, 0);
+
 	ImGui::Begin("test");
 	ImGui::SetWindowSize(ImVec2(200, 200));
 	if (selectedMesh != nullptr)

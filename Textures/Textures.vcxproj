@@ -19,11 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TextureApp.h" />
+    <ClInclude Include="inc\TextureApp.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="TextureApp.cpp" />
+    <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\TextureApp.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F1C73F91-95D1-4142-927C-7EE4C6AE3020}</ProjectGuid>

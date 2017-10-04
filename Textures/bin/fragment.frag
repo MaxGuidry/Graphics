@@ -29,8 +29,8 @@ void main() {
 	float rvToa = pow(DotRV, a);
 	 
 	vec2 duv = vUV;
-	duv.y+=time * .02f;
-	FragColor = texture(tex, duv);
+	//duv.y+=time * .02f;
+	FragColor =texture(tex, duv).rrrr;
 
 	//vec4((Ka*Ia) +(Id*Kd*lambertTerm)+ (Ks * Is * rvToa ),1)
 	 
