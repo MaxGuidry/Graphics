@@ -14,22 +14,25 @@
 
 float maxNoise(glm::vec2 verts, unsigned int dims, int seed)
 {
+	
+	
 	int prime = 36343;
-	char * c = new char[1];
-
-
-	for (int i = 0; i < seed; i++)
+	if (seed == 0)
+		seed = prime;
+	if (dims == 0)
+		dims = prime;
+	float c = (prime / seed) << dims / prime;
+	while (c == 0)
 	{
-		c++;
+		c = (prime << seed);
 	}
-	while (*c == 0)
-		c++;
-	float num = prime / float(seed) * *c;
 
-	float numa = sqrt(glm::abs(*c));
+	float num = prime / float(seed) * c;
+
+	float numa = sqrt(glm::abs(c));
 	if (numa == 0)
 		numa++;
-	float numb = float(prime) / sqrt(glm::abs(*c + prime));
+	float numb = glm::fract(float(prime) / sqrt(glm::abs(c + prime)));
 	if (numb == 0)
 		numb++;
 	float noise = 0.f;
@@ -37,26 +40,33 @@ float maxNoise(glm::vec2 verts, unsigned int dims, int seed)
 	float y = verts.y / float(dims);
 	x = glm::ceil(x * num + float(prime) / numa);
 	y = glm::ceil(y * prime * float(num) / numb);
-	float x2 = (verts.x - 1) / float(dims);
-	float y2 = (verts.y - 1) / float(dims);
+	float x2 = (verts.x - prime) / float(dims);
+	float y2 = (verts.y - dims) / float(dims);
 	x2 = glm::ceil(x2 * num + float(prime) / numa);
 	y2 = glm::ceil(y2 * prime * float(num) / numb);
-	float x3 = (verts.x + 1) / float(dims);
-	float y3 = (verts.y + 1) / float(dims);
+	float x3 = (verts.x + dims) / float(dims);
+	float y3 = (verts.y + prime) / float(dims);
 	x3 = glm::ceil(x3 * num + float(prime) / numa);
 	y3 = glm::ceil(y3 * prime * float(num) / numb);
-	glm::vec4 lerped = glm::vec4(glm::lerp(glm::vec2(x, y), glm::vec2(x2, y), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x, y2), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x2, y2), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x, y3), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x3, y), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x3, y3), .1f), 1, 1);
-	lerped = lerped * glm::rotate(float(sqrt(abs(*c))), glm::vec3(seed, *c, prime));
-
-	noise = glm::normalize(lerped).r;
-	if (dims == seed && noise <1 && noise>-1)
-		return noise* glm::sign(*c);
-	if (noise <1 && noise>-1)
-		return noise * maxNoise(verts, *c, *c)* glm::sign(*c);
+	glm::vec4 lerped = glm::vec4(x, y, 1, 1);// glm::vec4(glm::lerp(glm::vec2(x, y), glm::vec2(x2, y), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x, y2), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x2, y2), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x, y3), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x3, y), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x3, y3), .1f), 1, 1);
+	/*if (seed > prime)
+		lerped = lerped * glm::rotate(float(sqrt(abs(c))), glm::vec3(numa, numb, glm::fract(prime / c)));*/
+		//if (seed > dims)
+		//	lerped = lerped * glm::rotate(float(sqrt(abs(prime))), glm::vec3(c, prime, glm::fract(numb)));
+	if (numa < numb)
+		lerped = lerped * glm::rotate(float(sqrt(abs(c / prime))), glm::vec3(numa, c, glm::fract(float(t))));
 	else
-		noise = maxNoise(verts, dims, *(c++));
+		lerped = lerped * glm::rotate(float(sqrt(abs(c))), glm::vec3(seed, t, glm::fract(c)));
+	noise = (glm::normalize(lerped).x + glm::normalize(lerped).y + glm::normalize(lerped).z + glm::normalize(lerped).w);
+	noise = glm::fract(noise);
+	if (dims == seed && noise <1 && noise>-1)
+		return noise;
+	if (noise <1.f && noise>-1.f)
+		return noise * maxNoise(verts, numa, numa);
+	else
+		return glm::fract(noise);//noise = maxNoise(glm::vec2(noise, c), numb, numa);
 
-	return noise * glm::sign(*c);
+	return noise;
 
 
 }
@@ -136,17 +146,25 @@ bool TextureApp::Start()
 				//float perlinSample = glm::perlin(glm::vec2((float)x, (float)y) * scale * freq) * 0.5f + 0.5f;
 
 				float perlinSample = maxNoise(glm::vec2(float(x), float(y) * scale*freq), dims, seed) *.5f + .5f;
-				
-				
+				//float perlin2 = maxNoise(glm::vec2(float(x), float(y)) * scale * o * freq, dims, seed / scale);
+
 				//std::cout << perlinSample << std::endl;
-				perlinData[y * dims + x] += perlinSample * amplitude; amplitude *= persistence;
+				perlinData[y * dims + x] += perlinSample * amplitude;
+
+				amplitude *= persistence;
+				/*if (o != 0)
+					seed += int(pow(o , x+y)) << o;*/
 			}
+			perlinData[y * dims + x] = glm::fract(perlinData[y * dims + x]);
+
 			int f = (y * dims + x);
-			if (f > dims && f < (dims * dims) - 1)
-				perlinData[f + 1] = (perlinData[f+1] + perlinData[f] + perlinData[f-dims]) / 4.f;
-			std::cout << perlinData[f + 1] << std::endl;
+			//if (f > dims && f < (dims * dims) - 1)
+				//perlinData[f] = (perlinData[f+1] + perlinData[f] + perlinData[f-dims]) / 4.f;
+			std::cout << perlinData[f] << std::endl;
 		}
 	}
+
+
 	m.loadNoise(dims, dims, perlinData);
 	grid.loadNoise(dims, dims, perlinData);
 	grid.create_buffers();
