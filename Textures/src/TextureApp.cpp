@@ -12,21 +12,39 @@
 #include "imgui_impl_glfw_gl3.h"
 #include "MaxGizmos.h"
 
+unsigned int getRandom(unsigned seed0, unsigned seed1)
+{
+	for (int x = 0; x < 50; x++)
+		for (int y = 0; y < 50; y++)
+			std::cout << (x&y) << std::endl;
+
+	seed1 = 36969 * (seed1 & 65535) + (seed1 >> 16);
+	seed0 = 18000 * (seed0 & 65535) + (seed0 >> 16);
+	return (seed1 << 16) + seed0;
+}
+
 float maxNoise(glm::vec2 verts, unsigned int dims, int seed)
 {
-	
-	
+
+
 	int prime = 36343;
 	if (seed == 0)
 		seed = prime;
 	if (dims == 0)
 		dims = prime;
-	float c = (prime / seed) << dims / prime;
-	while (c == 0)
+	
+	char * p = new char[1];
+	p++;
+	while (p == nullptr || *p == 0)
 	{
-		c = (prime << seed);
+		p = new char[1];
+		p++;
 	}
-
+	float c = *p;
+	c *= sqrt(seed);
+	
+		//(prime / seed) << dims / prime;
+	
 	float num = prime / float(seed) * c;
 
 	float numa = sqrt(glm::abs(c));
@@ -48,15 +66,12 @@ float maxNoise(glm::vec2 verts, unsigned int dims, int seed)
 	float y3 = (verts.y + prime) / float(dims);
 	x3 = glm::ceil(x3 * num + float(prime) / numa);
 	y3 = glm::ceil(y3 * prime * float(num) / numb);
-	glm::vec4 lerped = glm::vec4(x, y, 1, 1);// glm::vec4(glm::lerp(glm::vec2(x, y), glm::vec2(x2, y), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x, y2), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x2, y2), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x, y3), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x3, y), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x3, y3), .1f), 1, 1);
+	glm::vec4 lerped = glm::vec4(glm::lerp(glm::vec2(x, y), glm::vec2(x2, y), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x, y2), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x2, y2), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x, y3), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x3, y), .1f) + glm::lerp(glm::vec2(x, y), glm::vec2(x3, y3), .1f), 1, 1);
 	/*if (seed > prime)
 		lerped = lerped * glm::rotate(float(sqrt(abs(c))), glm::vec3(numa, numb, glm::fract(prime / c)));*/
 		//if (seed > dims)
 		//	lerped = lerped * glm::rotate(float(sqrt(abs(prime))), glm::vec3(c, prime, glm::fract(numb)));
-	if (numa < numb)
-		lerped = lerped * glm::rotate(float(sqrt(abs(c / prime))), glm::vec3(numa, c, glm::fract(float(t))));
-	else
-		lerped = lerped * glm::rotate(float(sqrt(abs(c))), glm::vec3(seed, t, glm::fract(c)));
+	lerped = lerped * glm::rotate(float(sqrt(abs(c))), glm::vec3(sqrt(float(seed)), c, numb *numa));
 	noise = (glm::normalize(lerped).x + glm::normalize(lerped).y + glm::normalize(lerped).z + glm::normalize(lerped).w);
 	noise = glm::fract(noise);
 	if (dims == seed && noise <1 && noise>-1)
@@ -90,6 +105,63 @@ TextureApp::~TextureApp()
 {
 }
 
+int a[] = { 27697,	27701,	27733,	27737,	27739,	27743,	27749,	27751,	27763,	27767,
+27773,	27779,	27791,	27793,	27799,	27803,	27809,	27817,	27823,	27827,
+27847,	27851,	27883,	27893,	27901,	27917,	27919,	27941,	27943,	27947,
+27953,	27961,	27967,	27983,	27997,	28001,	28019,	28027,	28031,	28051,
+28057,	28069,	28081,	28087,	28097,	28099,	28109,	28111,	28123,	28151,
+28163,	28181,	28183,	28201,	28211,	28219,	28229,	28277,	28279,	28283,
+28289,	28297,	28307,	28309,	28319,	28349,	28351,	28387,	28393,	28403,
+28409,	28411,	28429,	28433,	28439,	28447,	28463,	28477,	28493,	28499,
+28513,	28517,	28537,	28541,	28547,	28549,	28559,	28571,	28573,	28579,
+28591,	28597,	28603,	28607,	28619,	28621,	28627,	28631,	28643,	28649,
+28657,	28661,	28663,	28669,	28687,	28697,	28703,	28711,	28723,	28729,
+28751,	28753,	28759,	28771,	28789,	28793,	28807,	28813,	28817,	28837,
+28843,	28859,	28867,	28871,	28879,	28901,	28909,	28921,	28927,	28933,
+28949,	28961,	28979,	29009,	29017,	29021,	29023,	29027,	29033,	29059,
+29063,	29077,	29101,	29123,	29129,	29131,	29137,	29147,	29153,	29167,
+29173,	29179,	29191,	29201,	29207,	29209,	29221,	29231,	29243,	29251,
+29269,	29287,	29297,	29303,	29311,	29327,	29333,	29339,	29347,	29363,
+29383,	29387,	29389,	29399,	29401,	29411,	29423,	29429,	29437,	29443,
+29453,	29473,	29483,	29501,	29527,	29531,	29537,	29567,	29569,	29573,
+29581,	29587,	29599,	29611,	29629,	29633,	29641,	29663,	29669,	29671,
+29683,	29717,	29723,	29741,	29753,	29759,	29761,	29789,	29803,	29819,
+29833,	29837,	29851,	29863,	29867,	29873,	29879,	29881,	29917,	29921,
+29927,	29947,	29959,	29983,	29989,	30011,	30013,	30029,	30047,	30059,
+30071,	30089,	30091,	30097,	30103,	30109,	30113,	30119,	30133,	30137,
+30139,	30161,	30169,	30181,	30187,	30197,	30203,	30211,	30223,	30241,
+30253,	30259,	30269,	30271,	30293,	30307,	30313,	30319,	30323,	30341,
+30347,	30367,	30389,	30391,	30403,	30427,	30431,	30449,	30467,	30469,
+30491,	30493,	30497,	30509,	30517,	30529,	30539,	30553,	30557,	30559,
+30577,	30593,	30631,	30637,	30643,	30649,	30661,	30671,	30677,	30689,
+30697,	30703,	30707,	30713,	30727,	30757,	30763,	30773,	30781,	30803,
+30809,	30817,	30829,	30839,	30841,	30851,	30853,	30859,	30869,	30871,
+30881,	30893,	30911,	30931,	30937,	30941,	30949,	30971,	30977,	30983,
+31013,	31019,	31033,	31039,	31051,	31063,	31069,	31079,	31081,	31091,
+31121,	31123,	31139,	31147,	31151,	31153,	31159,	31177,	31181,	31183,
+31189,	31193,	31219,	31223,	31231,	31237,	31247,	31249,	31253,	31259,
+31267,	31271,	31277,	31307,	31319,	31321,	31327,	31333,	31337,	31357,
+31379,	31387,	31391,	31393,	31397,	31469,	31477,	31481,	31489,	31511,
+31513,	31517,	31531,	31541,	31543,	31547,	31567,	31573,	31583,	31601,
+31607,	31627,	31643,	31649,	31657,	31663,	31667,	31687,	31699,	31721,
+31723,	31727,	31729,	31741,	31751,	31769,	31771,	31793,	31799,	31817,
+31847,	31849,	31859,	31873,	31883,	31891,	31907,	31957,	31963,	31973,
+31981,	31991,	32003,	32009,	32027,	32029,	32051,	32057,	32059,	32063,
+32069,	32077,	32083,	32089,	32099,	32117,	32119,	32141,	32143,	32159,
+32173,	32183,	32189,	32191,	32203,	32213,	32233,	32237,	32251,	32257,
+32261,	32297,	32299,	32303,	32309,	32321,	32323,	32327,	32341,	32353,
+32359,	32363,	32369,	32371,	32377,	32381,	32401,	32411,	32413,	32423,
+32429,	32441,	32443,	32467,	32479,	32491,	32497,	32503,	32507,	32531,
+32533,	32537,	32561,	32563,	32569,	32573,	32579,	32587,	32603,	32609,
+32611,	32621,	32633,	32647,	32653,	32687,	32693,	32707,	32713,	32717,
+32719,	32749,	32771,	32779,	32783,	32789,	32797,	32801,	32803,	32831,
+32833,	32839,	32843,	32869,	32887,	32909,	32911,	32917,	32933,	32939,
+32941,	32957,	32969,	32971,	32983,	32987,	32993,	32999,	33013,	33023,
+33029,	33037,	33049,	33053,	33071,	33073,	33083,	33091,	33107,	33113,
+33119,	33149,	33151,	33161,	33179,	33181,	33191,	33199,	33203,	33211,
+33223,	33247,	33287,	33289,	33301,	33311,	33317,	33329,	33331,	33343,
+33347,	33349,	33353,	33359,	33377,	33391,	33403,	33409,	33413,	33427,
+33457,	33461,	33469,	33479,	33487,	33493,	33503,	33521,	33529,	33533 };
 bool TextureApp::Start()
 {
 	glEnable(GL_BLEND);
@@ -129,7 +201,7 @@ bool TextureApp::Start()
 	//grid.loadTexture("./crate.png", STBI_rgb_alpha);
 
 	int dims = 64;
-	int seed = 7.f;
+	int seed = 7;
 	float *perlinData = new float[dims * dims];
 	float scale = (1.0f / dims) * 3;
 	int octaves = 6;
@@ -145,9 +217,14 @@ bool TextureApp::Start()
 				float freq = powf(2, (float)o);
 				//float perlinSample = glm::perlin(glm::vec2((float)x, (float)y) * scale * freq) * 0.5f + 0.5f;
 
+
+
+
+				seed = a[rand() % 569];
+				//std::cout << seed << std::endl;
 				float perlinSample = maxNoise(glm::vec2(float(x), float(y) * scale*freq), dims, seed) *.5f + .5f;
 				//float perlin2 = maxNoise(glm::vec2(float(x), float(y)) * scale * o * freq, dims, seed / scale);
-
+				
 				//std::cout << perlinSample << std::endl;
 				perlinData[y * dims + x] += perlinSample * amplitude;
 
@@ -158,8 +235,8 @@ bool TextureApp::Start()
 			perlinData[y * dims + x] = glm::fract(perlinData[y * dims + x]);
 
 			int f = (y * dims + x);
-			//if (f > dims && f < (dims * dims) - 1)
-				//perlinData[f] = (perlinData[f+1] + perlinData[f] + perlinData[f-dims]) / 4.f;
+			if (f > dims && f < (dims * dims) - 1)
+				perlinData[f] = (perlinData[f] + perlinData[f-dims]) / 2.f;
 			std::cout << perlinData[f] << std::endl;
 		}
 	}
