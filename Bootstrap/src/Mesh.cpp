@@ -1,5 +1,7 @@
 #include "Mesh.h"
 #include <gl_core_4_4.h>
+
+#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 
@@ -134,4 +136,6 @@ void Mesh::loadNoise(unsigned height, unsigned width, float* data)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	
+
 }

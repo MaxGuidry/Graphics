@@ -43,7 +43,7 @@ void main()
     vec3 Diffuse = Kd * Id * Ndl;
     vec3 R = reflect(L, N);
     vec3 E = normalize(camforward-P);
-    float specTerm = pow(max(0.0f, dot(R, E)), a);
+    float specTerm = pow(max(0.0f, dot(R, -E)), a);
     vec3 Specular = Ks * Is * specTerm;
     FragColor = vec4(Ambient + Diffuse + Specular ,1);
 }

@@ -6,8 +6,7 @@
 #include<glm/ext.hpp>
 #include<glm/glm.hpp>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb/stb_image.h>
+#include <stb/stb_image.h>	
 #include "imgui.h"
 #include "imgui_impl_glfw_gl3.h"
 #include "MaxGizmos.h"
@@ -15,7 +14,7 @@
 unsigned int getRandom(unsigned seed0, unsigned seed1)
 {
 	for (int x = 0; x < 50; x++)
-		for (int y = 0; y < 50; y++)
+		for (int y = 0; y < 50; y++)	
 			std::cout << (x&y) << std::endl;
 
 	seed1 = 36969 * (seed1 & 65535) + (seed1 >> 16);
@@ -25,7 +24,7 @@ unsigned int getRandom(unsigned seed0, unsigned seed1)
 
 float maxNoise(glm::vec2 verts, unsigned int dims, int seed)
 {
-
+		
 
 	int prime = 36343;
 	if (seed == 0)
@@ -198,53 +197,53 @@ bool TextureApp::Start()
 	m.create_buffers();
 	objects.push_back(m);
 	//objects.push_back(*GridMesh);
-	//m.loadTexture("./crate.png", STBI_rgb_alpha);
-	//grid.loadTexture("./crate.png", STBI_rgb_alpha);
+	m.loadTexture("./crate.png", STBI_rgb_alpha);
+	grid.loadTexture("./crate.png", STBI_rgb_alpha);
 
-	int dims = 64;
-	int seed = 7;
-	float *perlinData = new float[dims * dims];
-	float scale = (1.0f / dims) * 3;
-	int octaves = 6;
-	for (int x = 0; x < dims; ++x)
-	{
-		for (int y = 0; y < dims; ++y)
-		{
-			float amplitude = 1.f;
-			float persistence = 0.3f;
-			perlinData[y * dims + x] = 0;
-			for (int o = 0; o < octaves; ++o)
-			{
-				float freq = powf(2, (float)o);
-				//float perlinSample = glm::perlin(glm::vec2((float)x, (float)y) * scale * freq) * 0.5f + 0.5f;
-
-
+	//int dims = 64;
+	//int seed = 7;
+	//float *perlinData = new float[dims * dims];
+	//float scale = (1.0f / dims) * 3;
+	//int octaves = 6;
+	//for (int x = 0; x < dims; ++x)
+	//{
+	//	for (int y = 0; y < dims; ++y)
+	//	{
+	//		float amplitude = 1.f;
+	//		float persistence = 0.3f;
+	//		perlinData[y * dims + x] = 0;
+	//		for (int o = 0; o < octaves; ++o)
+	//		{
+	//			float freq = powf(2, (float)o);
+	//			float perlinSample = glm::perlin(glm::vec2((float)x, (float)y) * scale * freq) * 0.5f + 0.5f;
 
 
-				seed = a[rand() % 569];
-				//std::cout << seed << std::endl;
-				float perlinSample = maxNoise(glm::vec2(float(x), float(y) * scale*freq), dims, seed) *.5f + .5f;
-				//float perlin2 = maxNoise(glm::vec2(float(x), float(y)) * scale * o * freq, dims, seed / scale);
-				
-				//std::cout << perlinSample << std::endl;
-				perlinData[y * dims + x] += perlinSample * amplitude;
-
-				amplitude *= persistence;
-				/*if (o != 0)
-					seed += int(pow(o , x+y)) << o;*/
-			}
-			perlinData[y * dims + x] = glm::fract(perlinData[y * dims + x]);
-
-			int f = (y * dims + x);
-			if (f > dims && f < (dims * dims) - 1)
-				perlinData[f] = (perlinData[f] + perlinData[f-dims]) / 2.f;
-			std::cout << perlinData[f] << std::endl;
-		}
-	}
 
 
-	m.loadNoise(dims, dims, perlinData);
-	grid.loadNoise(dims, dims, perlinData);
+	//			seed = a[rand() % 569];
+	//			//std::cout << seed << std::endl;
+	//			//float perlinSample = maxNoise(glm::vec2(float(x), float(y) * scale*freq), dims, seed) *.5f + .5f;
+	//			//float perlin2 = maxNoise(glm::vec2(float(x), float(y)) * scale * o * freq, dims, seed / scale);
+	//			
+	//			//std::cout << perlinSample << std::endl;
+	//			perlinData[y * dims + x] += perlinSample * amplitude;
+
+	//			amplitude *= persistence;
+	//			/*if (o != 0)
+	//				seed += int(pow(o , x+y)) << o;*/
+	//		}
+	//		perlinData[y * dims + x] = glm::fract(perlinData[y * dims + x]);
+
+	//		int f = (y * dims + x);
+	//		if (f > dims && f < (dims * dims) - 1)
+	//			perlinData[f] = (perlinData[f] + perlinData[f-dims]) / 2.f;
+	//		std::cout << perlinData[f] << std::endl;
+	//	}
+	//}
+
+
+	//m.loadNoise(dims, dims, perlinData);
+	//grid.loadNoise(dims, dims, perlinData);
 	grid.create_buffers();
 	objects.push_back(grid);
 
@@ -263,7 +262,7 @@ bool TextureApp::Update(float deltaTime)
 
 
 
-	if (glfwGetKey(window, GLFW_KEY_F12))
+	if (glfwGetKey(window, GLFW_KEY_F11))
 		selectedMesh->loadTexture(selectedMesh->texture.textureFile, STBI_default);
 	glfwGetCursorPos(window, &mousex, &mousey);
 	glm::vec2 cpos = glm::vec2(mousex, mousey);

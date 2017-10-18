@@ -136,7 +136,7 @@ Mesh * RenderingApp::GenGrid(unsigned int rows, unsigned int cols)
 	for (unsigned int i = 0; i < index; i++)
 		indices.push_back(auiIndices[i]);
 	Mesh * gridMesh = new Mesh();
-	gridMesh->initialize(verts, indices);
+	gridMesh->initialize(verts, indices,GL_TRIANGLES);
 	gridMesh->create_buffers();
 	gridMesh->bind();
 	verts.clear();
@@ -180,7 +180,7 @@ Mesh* RenderingApp::GenSphereWithCircleEquation(float radius, unsigned verts)
 		sphereVerts.push_back(v);
 	}
 	Mesh * sp_here = new Mesh();
-	sp_here->initialize(sphereVerts, std::vector<unsigned int>());
+	sp_here->initialize(sphereVerts, std::vector<unsigned int>(),GL_TRIANGLES);
 	return sp_here;
 }
 
@@ -277,7 +277,7 @@ bool RenderingApp::Start()
 		circleIndices.push_back(i);
 		circleIndices.push_back(i);
 	}*/
-	circle.initialize(circleVerts, circleIndices);
+	circle.initialize(circleVerts, circleIndices,GL_LINE);
 	circle.create_buffers();
 
 #pragma endregion 
@@ -287,11 +287,11 @@ bool RenderingApp::Start()
 	unsigned int meridians = 10;
 	
 	Mesh m = MaxGizmos::GenSphere(1.f, 10, 10);
-	SPHERE.initialize(m.getVerts(), m.getIndices());
+	SPHERE.initialize(m.getVerts(), m.getIndices(),GL_TRIANGLE_STRIP);
 	SPHERE.create_buffers();
 
 
-	box.initialize(boxVerts, boxindeces);
+	box.initialize(boxVerts, boxindeces,GL_TRIANGLE_STRIP);
 	box.create_buffers();
 	return true;
 }
@@ -373,11 +373,11 @@ bool RenderingApp::Draw()
 	unsigned int time = glGetUniformLocation(m_StandardShaderID, "time");
 	glUniform1f(time, glfwGetTime());
 	glUniformMatrix4fv(projectionViewUniform, 1, false, glm::value_ptr(camera->getProjectionView() * glm::translate(glm::vec3(1,0,-1))));
-	mesh->draw(GL_TRIANGLES);
+	mesh->draw();
 	mesh->unbind();
 	box.bind();
 	glUniformMatrix4fv(projectionViewUniform, 1, false, glm::value_ptr(camera->getProjectionView()));
-	box.draw(GL_TRIANGLES);
+	box.draw();
 	box.unbind();
 	circle.bind();
 	glm::mat4 x = glm::mat4(
@@ -400,7 +400,7 @@ bool RenderingApp::Draw()
 	glm::mat4 scale5 = glm::scale(glm::vec3(5, 5, 5));
 	glUniformMatrix4fv(projectionViewUniform, 1, false, glm::value_ptr(camera->getProjectionView() * glm::translate(glm::vec3(0, -10, 0))  * scale5));
 	//glDrawArrays(GL_POINTS, 0, sphere->vertRef.size());
-	SPHERE.draw(GL_TRIANGLE_STRIP);
+	SPHERE.draw();
 	SPHERE.unbind();
 
 	glUseProgram(0);
